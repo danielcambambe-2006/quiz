@@ -1,0 +1,2858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiz Otaku - Milionário</title>
+<style>
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+   
+  }
+
+  body {
+    height: 100vh;
+    background: url('https://wallpaperaccess.com/full/1121633.jpg') no-repeat center center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+     background-repeat: no-repeat;
+     background-size: cover;
+     background-position: center;
+     transition: background-image 0.5s ease-in-out; /* opcional para suavidade */
+  }
+ 
+  .div-container {
+    width: 90%;
+    max-width: 900px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    min-height: 350px;
+  }
+  .div1, .div2, .div3 {
+    width: 100%;
+  }
+  .div1 {
+    display: flex;
+    gap: 10px;
+  }
+  .div-a {
+    flex: 1;
+    background: rgba(255, 165, 0, 0.7);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+  .div-b {
+    flex: 3;
+    background: linear-gradient(to top right, #001f3f, #003366, #004080);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    font-size: 1.2em;
+  }
+  .div2 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .answer {
+    background: #001f3f;
+    border: 3px solid white;
+    border-radius: 50px;
+    padding: 15px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    position: relative;
+    user-select: none;
+  }
+  .answer:hover:not(.disabled) {
+    transform: scale(1.03);
+  }
+  .answer span {
+    color: orange;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  .div3 {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .help-icon {
+    width: 50px;
+    height: 50px;
+    border: 2px solid white;
+    border-radius: 50%;
+    color: white;
+    font-size: 0.8em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(0, 0, 50, 0.7);
+    text-align: center;
+    transition: background 0.3s, opacity 0.3s;
+    user-select: none;
+  }
+  .help-icon:hover:not(.disabled) {
+    background: rgba(0, 0, 100, 0.8);
+  }
+  .help-icon.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: default;
+  }
+  .timer {
+    position: absolute;
+    top: 17px;
+    right: 5px;
+    background: #001f3f;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: green;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    text-align: center;
+    animation: blink 1s infinite alternate;
+    user-select: none;
+    z-index: 100;
+  }
+
+.vida {
+    position: absolute;
+    top: 90px;
+    right: 5px;
+    background: #001f3f;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    text-align: center;
+    user-select: none;
+    z-index: 100;
+    opacity: 0.5;
+    animation: blink 1s infinite alternate;
+  }
+
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
+  .correct { background: green !important; color: white; }
+  .wrong { background: red !important; color: white; }
+  .disabled {
+    pointer-events: none !important;
+    opacity: 0.5 !important;
+  }
+  .percent-hint {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+    font-size: 0.8em;
+    color: #ccc;
+    user-select: none;
+  }
+  /* Tela inicial e final */
+  #start-screen, #end-screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border-radius: 15px;
+    font-size: 1.4em;
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+  }
+  #start-screen button, #end-screen button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    font-size: 1.2em;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    background-color: orange;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  #start-screen button:hover, #end-screen button:hover {
+    background-color: darkorange;
+  }
+
+
+
+
+  #pre-start-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+}
+
+#pre-start-screen h2 {
+  color: #FFD700; /* Amarelo ouro */
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
+  text-shadow: 2px 2px 8px rgba(255, 215, 0, 0.5);
+}
+
+#pre-start-screen p {
+  font-size: 1.2em;
+  max-width: 600px;
+  margin: 0 auto 1.5em auto;
+  line-height: 1.6;
+  color: #ccc;
+}
+
+#countdown {
+  font-size: 1.5em;
+  margin-top: 20px;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+#senha-container {
+  display: none;
+  margin-top: 20px;
+}
+
+#senha-input {
+  padding: 12px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: none;
+  width: 200px;
+  outline: none;
+}
+
+#senha-input::placeholder {
+  color: #aaa;
+}
+
+#senha-container button {
+  padding: 12px 20px;
+  font-size: 1em;
+  margin-left: 10px;
+  background-color: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+#senha-container button:hover {
+  background-color: #e6c200;
+}
+
+#senha-erro {
+  color: red;
+  margin-top: 10px;
+  display: none;
+  font-weight: bold;
+}
+
+
+body {
+  margin: 0;
+  background-color: #000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+}
+
+/* Tela Pre-Start */
+#pre-start-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  text-align: center;
+}
+
+#pre-start-screen h2 {
+  font-size: 2em;
+  color: #FFD700;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 5px rgba(255, 215, 0, 0.4);
+}
+
+#pre-start-screen p {
+  font-size: 1.1em;
+  color: #ccc;
+  margin-bottom: 30px;
+}
+
+#countdown {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+#senha-container {
+  display: none;
+  margin-top: 20px;
+}
+
+#senha-input {
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: none;
+}
+
+#senha-container button {
+  padding: 10px 20px;
+  font-size: 1em;
+  margin-left: 10px;
+  background-color: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#senha-container button:hover {
+  background-color: #e6c200;
+}
+
+#senha-erro {
+  color: red;
+  margin-top: 10px;
+  display: none;
+}
+
+/* Tela Inicial */
+#start-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #111;
+  padding: 40px;
+  text-align: center;
+}
+
+#start-screen h1 {
+  color: #FFD700;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 5px rgba(255, 215, 0, 0.4);
+}
+
+#start-screen p {
+  font-size: 1.2em;
+  color: #ccc;
+  margin-bottom: 30px;
+}
+
+#start-button {
+  padding: 15px 30px;
+  font-size: 1.1em;
+  background-color: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#start-button:hover {
+  background-color: #e6c200;
+  transform: scale(1.05);
+}
+
+/* Tela Final */
+#end-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #111;
+  padding: 40px;
+  text-align: center;
+}
+
+#end-screen h1 {
+  color: #FFD700;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+#final-score {
+  font-size: 1.3em;
+  color: #ccc;
+  margin-bottom: 20px;
+
+}
+
+#restart-button {
+  padding: 15px 30px;
+  font-size: 1.1em;
+  background-color: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#restart-button:hover {
+  background-color: #e6c200;
+  transform: scale(1.05);
+}
+
+/* Perguntas e Opções */
+#quiz-container {
+  padding: 40px;
+  background-color: #111;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+#quiz-container h2 {
+  color: #FFD700;
+  font-size: 2.2em;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 5px rgba(255, 215, 0, 0.4);
+}
+
+#quiz-container p {
+  font-size: 1.1em;
+  color: #ccc;
+  margin-bottom: 30px;
+}
+
+#pergunta h3 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+#opcoes {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#opcoes li {
+  margin: 0;
+}
+
+#opcoes button {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1em;
+  background-color: #222;
+  color: #FFD700;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#opcoes button:hover {
+  background-color: #333;
+  transform: scale(1.03);
+}
+/* MENU SUPERIOR */
+.menu-superior {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #111;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 10000;
+  font-family: 'Arial', sans-serif;
+}
+
+.menu-icon {
+  height: 140px;
+  width: 140px;
+  object-fit: contain;
+}
+
+
+.menu-icon {
+  height: 100px;
+  width: 100px;
+  object-fit: contain;
+  margin-left: auto;
+}
+
+
+
+/* LINKS */
+.menu-direita a {
+  margin-left: 20px;
+  color: #FFD700;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.menu-direita a:hover {
+  color: white;
+}
+
+/* HAMBÚRGUER */
+.menu-hamburguer {
+  display: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: #FFD700;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .menu-direita {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #111;
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .menu-direita.show {
+    display: flex;
+  }
+
+  .menu-direita a {
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  .menu-hamburguer {
+    display: block;
+  }
+}
+
+body {
+  background-image: url('1212.jpg'); /* substitua pelo seu caminho */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#pre-start-screen,
+#start-screen,
+#end-screen {
+  background-color: rgba(0, 0, 0, 0.7); /* Preto com 70% de opacidade */
+  color: white; /* Garante legibilidade */
+  padding: 30px;
+  border-radius: 10px;
+  backdrop-filter: blur(4px); /* opcional: adiciona um desfoque bonito */
+}
+
+.no-break {
+  white-space: nowrap;
+}
+
+
+
+
+
+
+.answer {
+  transition: background-color 0.4s ease, transform 0.3s ease, opacity 0.3s ease;
+}
+
+.answer.correct {
+  background-color: #4CAF50; /* Verde */
+  transform: scale(1.05);    /* Leve aumento visual */
+}
+
+.answer.wrong {
+  background-color: #f44336; /* Vermelho */
+  transform: scale(0.95);    /* Leve redução visual */
+}
+
+.answer.disabled {
+  opacity: 0.5;
+}
+
+
+
+.rodape-fixo {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #111;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  z-index: 99999;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+}
+
+.rodape-direita a {
+  margin-left: 15px;
+}
+
+.icone-social {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
+  transition: transform 0.2s;
+}
+
+.icone-social:hover {
+  transform: scale(1.1);
+}
+
+#start-screen p {
+  font-size: 0.9em; /* ou ajuste conforme o desejado */
+}
+
+
+
+#tempoFinalizadoOverlay {
+    display: none; /* começa oculto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.85);
+    color: white;
+    font-size: 1.5rem;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    z-index: 99999999; /* z-index super alto para ficar no topo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  h3{
+    color:#e6c200;
+    padding-bottom: 5px;
+  }
+
+
+/* Define a animação para piscar suavemente */
+@keyframes piscarSuave {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3; /* Texto fica quase transparente no meio da animação */
+  }
+}
+
+/* Aplica a animação ao texto */
+.texto-piscando {
+  animation: piscarSuave 2s infinite; /* 2 segundos para completar o ciclo, repetindo para sempre */
+}
+
+.ponto-inferior {
+    font-size: 1.3em;
+    color: #ccc;
+    margin-bottom: 5px;
+    animation: piscar 2s infinite ease-in-out;
+}
+
+
+@keyframes piscar {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+  
+@media only screen and (orientation: landscape) and (max-width: 768px) {
+  body {
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+}
+
+  .texto-piscando {
+      
+      animation: piscar 1s infinite;
+    }
+
+
+
+</style>
+</head>
+<body>
+
+
+ <div id="conteudoSite" style="display:none;"></div>
+
+
+<!-- MENU SUPERIOR RESPONSIVO -->
+<div class="menu-superior">
+
+
+   <div class="menu-hamburguer" onclick=" const menu = document.getElementById('menu-links');
+    menu.classList.toggle('show');">
+    &#9776;
+  </div>
+
+  <div class="menu-esquerda">
+    <img src="Logotipo.png" alt="Ícone da Página" class="menu-icon" />
+  </div>
+
+ 
+    <div class="menu-direita" id="menu-links"> 
+          <a href="https://otakumilionarioquiz.github.io/Game-/f1f3f4g5g6h2g4h4j3j9s5n7h3b0n238bnr9fwnw72h28292n28gfpm.html">Início</a>
+          <a href="regras.html">Regras</a>
+          <a href="sobre.html">Sobre nós</a>
+          <a href="senha.html">Comprar senha</a>
+    </div>
+</div>
+
+
+
+<!-- Overlay que aparecerá quando o tempo finalizar -->
+<div id="tempoFinalizadoOverlay">
+  <div>
+      <img src="Logotipo.png" alt="Ícone da Página" class="menu-icon" />
+       <h3>Otaku Milionário Quiz</h3>
+        <p class="texto-piscando">
+           Competição encerrada. Obrigado por participar! Esteja atento às novas competições que serão realizadas em breve.
+        </p>
+        <p style="color: #FFD700; font-size: 20px; padding-top: 5px;">
+           Visite nossa página no <a href="https://www.facebook.com/share/1CY4trwHcZ/" target="_blank" style="color: #FFD700; text-decoration: underline;">Facebook</a>
+        </p>
+
+
+
+  </div>
+</div>
+
+
+
+
+<!--<div id="pre-start-screen">
+  <h2>Otaku Milionário Quiz</h2>-->
+  <div id="countdown"></div>
+
+  <div id="senha-container">
+    <input type="password" id="senha-input" placeholder="Senha de Acesso" style="margin-bottom: 15px;" />
+    <button onclick="verificarSenha()">Entrar</button>
+    <div id="senha-erro">Senha de acesso incorreta.</div>
+  </div>
+</div>
+
+
+
+<div class="timer" id="timer" style="display:none;">10</div>
+<div class="vida" id="vida-restante" style="display:none;"></div>
+
+<div class="div-container" id="game-container" style="display:none;">
+  <div class="div1">
+    <div class="div-a" id="score">Kz 0</div>
+    <div class="div-b" id="question">Carregando pergunta...</div>
+  </div>
+  <div class="div2" id="answers"></div>
+  <div class="div3">
+    <div class="help-icon" id="help1" title="Mostrar porcentagem">%</div>
+    <div class="help-icon" id="help2" title="Eliminar 2 respostas erradas">2/4</div>
+    <div class="help-icon" id="help3" title="Mostrar resposta correta">✔</div>
+    <div class="help-icon" id="help4" title="Pular pergunta">Pular</div>
+  </div>
+</div>
+-->
+
+
+
+
+<!-- Tela Inicial -->
+<div id="start-screen" class="star-screen-fundo">
+
+  <h1>Otaku Milionário Quiz</h1>
+   
+  <p>
+      Bem-vindo ao maior desafio otaku! <br>
+      Mostre seus conhecimentos respondendo a perguntas sobre animes e desenhos animados, conquiste pontos e avance como um verdadeiro milionário.
+  </p>
+    
+    <p>Use as ajudas com sabedoria!</p>
+  
+    <button id="start-button">Começar</button>
+
+</div>
+
+<!-- Tela Final -->
+<div id="end-screen" style="display:none;">
+  <h1>Fim de Jogo!</h1>
+  <p id="final-score"></p>
+  <p class="ponto-inferior">Você deve ter 2000Kz em pontos para obter a chave secreta</p>
+  <button class="tente-novamente" id="restart-button">Jogar novamente</button>
+  <button class="chave-button">Reclamar prêmio</button>
+  <p style="margin-top:15px; font-size:12px;" class="final-score texto-piscando" id="whatsapp-chave"> Ou reivindique o seu prêmio  enviando a chave secreta para o Whatsapp: 
+                                                             <a href="https://wa.me/244932162322" target="_blank">
+                                                                                    <span style="color: yellow;">932162322</span>
+                                                               </a>
+   </p> 
+  
+</div>
+
+
+
+<!-- Áudios -->
+<audio id="bgMusic" loop>
+  <source src="Som_de_fundo.mp3" type="audio/mp3" />
+  Seu navegador não suporta áudio.
+</audio>
+
+<audio id="correctSound">
+  <source src="Vitoria.mp3" type="audio/mp3" />
+  Seu navegador não suporta áudio.
+</audio>
+
+<audio id="wrongSound">
+  <source src="Perdedor.mp3" type="audio/mp3" />
+  Seu navegador não suporta áudio.
+</audio>
+
+
+
+
+  
+<!-- Rodapé Fixo (visível apenas na tela de login) -->
+<footer class="rodape-fixo" id="rodape-login">
+  <div class="rodape-esquerda">
+           © 2025 Otaku Milionário Quiz
+  </div>
+  <div class="rodape-direita">
+    <a href="https://www.facebook.com/profile.php?id=61577770801569">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" class="icone-social">
+    </a>
+    <a href="https://www.tiktok.com/@otakumilionario?_t=ZG-8x5cWkFOEUr&_r=1" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok" class="icone-social">
+    </a>
+  </div>
+</footer>
+
+
+
+<script>
+
+ 
+//Matriz perguntas 
+
+const perguntas = [
+  {
+    anime: 'Solo Leveling',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.RLLhHZToBdphJqzxHApuLAHaKo?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do protagonista de Solo Leveling?',
+    respostas: ['Sung Jinwoo', 'Yoo Jinho', 'Cha Haein', 'Thomas Andre'],
+    correta: 0
+  },
+  {
+    anime: 'Solo Leveling',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.RLLhHZToBdphJqzxHApuLAHaKo?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quantos caçadores de Rank S existem na Coreia do Sul antes da missão das formigas?',
+    respostas: ['4', '6', '8', '10'],
+    correta: 2
+  },
+  {
+    anime: 'Solo Leveling',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.RLLhHZToBdphJqzxHApuLAHaKo?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do primeiro monarca das sombras?',
+    respostas: ['Ashborn', 'Antares', 'Beru', 'Kamish'],
+    correta: 0
+  },
+  {
+    anime: 'Solo Leveling',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.RLLhHZToBdphJqzxHApuLAHaKo?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome da guilda que Cha Haein pertence?',
+    respostas: ['Guilda dos Caçadores', 'Guilda do Tigre Branco', 'Guilda dos Falcões', 'Guilda dos Reapers'],
+    correta: 1
+  },
+  {
+    anime: 'Frieren: Beyond Journey\'s End',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.sH-eALAL-nfxfysfoH3KDgHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome da protagonista do anime Frieren?',
+    respostas: ['Fern','Frieren', 'Stark', 'Himmel'],
+    correta: 1
+  },
+  {
+    anime: 'Frieren: Beyond Journey\'s End',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.sH-eALAL-nfxfysfoH3KDgHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quem é o mentor de Fern antes de ela se juntar a Frieren?',
+    respostas: ['Heiter', 'Eisen', 'Stark', 'Himmel'],
+    correta: 0
+  },
+  {
+    anime: 'Frieren: Beyond Journey\'s End',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.sH-eALAL-nfxfysfoH3KDgHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quantos anos tem Fern no início da jornada com Frieren?',
+    respostas: ['16', '18', '20', '22'],
+    correta: 1
+  },
+  {
+    anime: 'Frieren: Beyond Journey\'s End',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.sH-eALAL-nfxfysfoH3KDgHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o objetivo de Frieren em sua nova jornada?',
+    respostas: ['Encontrar Himmel', 'Aprender feitiços raros', 'Recriar a guilda dos heróis','Derrotar o Rei Demônio'],
+    correta: 3
+  },
+  {
+    anime: 'Tensei Shitara Slime Datta Ken',
+    fundo: 'https://th.bing.com/th/id/R.87a782b85ef625d643505eafdd66cb7d?rik=0WGYEv55MMKvzg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do protagonista de Tensei Shitara Slime Datta Ken?',
+    respostas: ['Satoru Mikami', 'Veldora Tempest','Rimuru Tempest', 'Shizue Izawa'],
+    correta: 2
+  },
+  {
+    anime: 'Tensei Shitara Slime Datta Ken',
+    fundo: 'https://th.bing.com/th/id/R.87a782b85ef625d643505eafdd66cb7d?rik=0WGYEv55MMKvzg&pid=ImgRaw&r=0',
+    pergunta: 'Qual habilidade Rimuru recebe ao devorar Veldora?',
+    respostas: ['Predador', 'Grande Sábio', 'Tempestade', 'Raphael'],
+    correta: 0
+  },
+  {
+    anime: 'Tensei Shitara Slime Datta Ken',
+    fundo: 'https://th.bing.com/th/id/R.87a782b85ef625d643505eafdd66cb7d?rik=0WGYEv55MMKvzg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da habilidade evoluída de "Grande Sábio" que Rimuru adquire?',
+    respostas: ['Azathoth','Raphael', 'Ciel', 'Faust'],
+    correta: 1
+  },
+  {
+    anime: 'Tensei Shitara Slime Datta Ken',
+    fundo: 'https://th.bing.com/th/id/R.87a782b85ef625d643505eafdd66cb7d?rik=0WGYEv55MMKvzg&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o criador do sistema de reencarnação que permite a Rimuru ser transportado para outro mundo?',
+    respostas: ['Rimuru Tempest', 'Satoru Mikami','Veldanava', 'Shizue Izawa'],
+    correta: 2
+  },
+  {
+    anime: 'Tate no Yuusha no Nariagari',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.StnYrBuTUOxmosKZM_NhTQHaK4?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do protagonista de Tate no Yuusha no Nariagari?',
+    respostas: ['Naofumi Iwatani', 'Motoyasu Kitamura', 'Ren Amaki', 'Itsuki Kawasumi'],
+    correta: 0
+  },
+  {
+    anime: 'Tate no Yuusha no Nariagari',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.StnYrBuTUOxmosKZM_NhTQHaK4?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é a arma lendária que Naofumi Iwatani recebe?',
+    respostas: ['Lança', 'Espada', 'Arco','Escudo'],
+    correta: 3
+  },
+  {
+    anime: 'Tate no Yuusha no Nariagari',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.StnYrBuTUOxmosKZM_NhTQHaK4?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quem é a primeira companheira de Naofumi?',
+    respostas: ['Filo', 'Melty Q Melromarc','Raphtalia','Rishia Ivyred'],
+    correta: 2
+  },
+  {
+    anime: 'Tate no Yuusha no Nariagari',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.StnYrBuTUOxmosKZM_NhTQHaK4?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome da habilidade que permite a Naofumi criar escudos a partir de materiais?',
+    respostas: ['Criação de Escudo', 'Escudo de Força', 'Escudo de Energia', 'Escudo de Defesa'],
+    correta: 0
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://www.mangaread.org/wp-content/uploads/2019/11/Read-Manga-24.jpg',
+    pergunta: 'Qual é o nome do protagonista de Jujutsu Kaisen?',
+    respostas: ['Megumi Fushiguro','Yuji Itadori', 'Nobara Kugisaki', 'Satoru Gojo'],
+    correta: 1
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://www.mangaread.org/wp-content/uploads/2019/11/Read-Manga-24.jpg',
+    pergunta: 'Qual é a técnica amaldiçoada de Yuji Itadori?',
+    respostas: ['Black Flash', 'Cursed Speech','Divergent Fist', 'Idle Transfiguration'],
+    correta: 2
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://www.mangaread.org/wp-content/uploads/2019/11/Read-Manga-24.jpg',
+    pergunta: 'Qual é a técnica amaldiçoada de Megumi Fushiguro?',
+    respostas: ['Cursed Speech', 'Limitless', 'Idle Transfiguration','Ten Shadows Technique'],
+    correta: 3
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://www.mangaread.org/wp-content/uploads/2019/11/Read-Manga-24.jpg',
+    pergunta: 'Quem é o "Rei das Maldições" em Jujutsu Kaisen?',
+    respostas: ['Satoru Gojo', 'Suguru Geto','Ryomen Sukuna','Kenjaku'],
+    correta: 2
+  },
+  {
+    anime: 'Nanatsu no Taizai',
+    fundo: 'https://www.bing.com/images/search?view=detailV2&ccid=bdATRsua&id=1E50F8A8F78532D00CD1E7D9FD88DFCEBF0E9F91&thid=OIP.bdATRsuaOgyky_0_ho88fQHaLR&mediaurl=https%3a%2f%2f1.bp.blogspot.com%2f-GUvpWQqkIq8%2fXzBT0rmobiI%2fAAAAAAAARLU%2f80GxyY4LZLAKow6MlaEm4dMQLO_OamAoACLcBGAsYHQ%2fs2048%2fNanatsu%252Bno%252BTaizai.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.6dd01346cb9a3a0ca4cbfd3f868f3c7d%3frik%3dkZ8Ov87fiP3Z5w%26pid%3dImgRaw%26r%3d0&exph=2048&expw=1346&q=Nanatsu+no+Taizai+manga+page&simid=608019060756671700&FORM=IRPRST&ck=D0E18D6CDFA8165FA4A6FD62BE26CA8B&selectedIndex=35&itb=0&ajaxhist=0&ajaxserp=0',
+    pergunta: 'Qual é o nome do protagonista de Nanatsu no Taizai?',
+    respostas: ['Escanor', 'Ban','Meliodas', 'Gowther'],
+    correta: 2
+  },
+  {
+    anime: 'Nanatsu no Taizai',
+    fundo: 'https://www.bing.com/images/search?view=detailV2&ccid=bdATRsua&id=1E50F8A8F78532D00CD1E7D9FD88DFCEBF0E9F91&thid=OIP.bdATRsuaOgyky_0_ho88fQHaLR&mediaurl=https%3a%2f%2f1.bp.blogspot.com%2f-GUvpWQqkIq8%2fXzBT0rmobiI%2fAAAAAAAARLU%2f80GxyY4LZLAKow6MlaEm4dMQLO_OamAoACLcBGAsYHQ%2fs2048%2fNanatsu%252Bno%252BTaizai.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.6dd01346cb9a3a0ca4cbfd3f868f3c7d%3frik%3dkZ8Ov87fiP3Z5w%26pid%3dImgRaw%26r%3d0&exph=2048&expw=1346&q=Nanatsu+no+Taizai+manga+page&simid=608019060756671700&FORM=IRPRST&ck=D0E18D6CDFA8165FA4A6FD62BE26CA8B&selectedIndex=35&itb=0&ajaxhist=0&ajaxserp=0',
+    pergunta: 'Qual é o pecado que Meliodas representa?',
+    respostas: ['Ira', 'Luxúria', 'Ganância', 'Preguiça'],
+    correta: 0
+  },
+  {
+    anime: 'Nanatsu no Taizai',
+    fundo: 'https://somoskudasai.com/wp-content/uploads/2018/08/91KJis6MgvL-e1533606642469.jpg',
+    pergunta: 'Qual é a habilidade mágica de Ban?',
+    respostas: ['Full Counter','Snatch', 'Creation', 'Disaster'],
+    correta: 1
+  },
+  {
+    anime: 'Nanatsu no Taizai',
+    fundo: 'https://somoskudasai.com/wp-content/uploads/2018/08/91KJis6MgvL-e1533606642469.jpg',
+    pergunta: 'Quem é o "Rei Demônio" em Nanatsu no Taizai?',
+    respostas: ['Rei Demônio', 'Suprema Deusa', 'Escanor', 'Merlin'],
+    correta: 0
+  },
+  {
+    anime: 'Yu-Gi-Oh! GX',
+    fundo: 'https://image.tmdb.org/t/p/original/vhY30rXaM5axSpAdr1M1HRQrQGa.jpg',
+    pergunta: 'Qual é o nome do protagonista de Yu-Gi-Oh! GX?',
+    respostas: ['Yugi Mutou', 'Seto Kaiba', 'Yusei Fudo','Jaden Yuki'],
+    correta: 3
+  },
+  {
+    anime: 'Yu-Gi-Oh! GX',
+    fundo: 'https://static.zerochan.net/Yu-Gi-Oh%21.GX.1024.454853.webp',
+    pergunta: 'Qual é a carta principal do deck de Jaden Yuki?',
+    respostas: ['Elemental HERO Neos', 'Dark Magician', 'Blue-Eyes White Dragon', 'Red-Eyes Black Dragon'],
+    correta: 0
+  },
+  {
+    anime: 'Yu-Gi-Oh! GX',
+    fundo: 'https://static.zerochan.net/Yu-Gi-Oh%21.GX.1024.3965932.webp',
+    pergunta: 'Quem é o principal antagonista da série?',
+    respostas: ['Marik Ishtar', 'Maximillion Pegasus','Nightshroud', 'Zane Truesdale'],
+    correta: 2
+  },
+  {
+    anime: 'Yu-Gi-Oh! GX',
+    fundo: 'https://static.zerochan.net/Yu-Gi-Oh%21.GX.1024.3965932.webp',
+    pergunta: 'Qual é a habilidade especial de Jaden Yuki?',
+    respostas: ['Gentle Darkness', 'Duel Spirit', 'Polymerization Mastery', 'Shadow Games'],
+    correta: 0
+  },
+  {
+    anime: 'Shin Chan',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/fiche/300/1425.jpg',
+    pergunta: 'Qual é o nome completo do protagonista de Shin Chan?',
+    respostas: ['Shinnosuke Nohara', 'Hiroshi Nohara', 'Misae Koyama', 'Himawari Nohara'],
+    correta: 0
+  },
+  {
+    anime: 'Shin Chan',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/fiche/300/1425.jpg',
+    pergunta: 'Como se chama o cão da família Nohara em Portugal?',
+    respostas: ['Shiro', 'Toto', 'Pompom','Floquito'],
+    correta: 3
+  },
+  {
+    anime: 'Shin Chan',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/fiche/300/1425.jpg',
+    pergunta: 'Em que cidade do Japão vive a família Nohara?',
+    respostas: ['Tóquio','Kasukabe','Osaka', 'Nagoya'],
+    correta: 1
+  },
+  {
+    anime: 'Shin Chan',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/fiche/300/1425.jpg',
+    pergunta: 'Quem foi o criador do manga original Shin Chan?',
+    respostas: ['Yoshito Usui', 'Hayao Miyazaki', 'Osamu Tezuka', 'Naoko Takeuchi'],
+    correta: 0
+  },
+  {
+    anime: 'Yu-Gi-Oh! (Millennium Puzzle)',
+    fundo: 'https://gamex.gg/wp-content/uploads/2023/02/s-l1600.png',
+    pergunta: 'Qual é o nome do protagonista que resolve o Enigma do Milénio?',
+    respostas: ['Yugi Muto', 'Seto Kaiba', 'Joey Wheeler', 'Ryo Bakura'],
+    correta: 0
+  },
+  {
+    anime: 'Yu-Gi-Oh! (Millennium Puzzle)',
+    fundo: 'https://gamex.gg/wp-content/uploads/2023/02/s-l1600.png',
+    pergunta: 'O que acontece quando Yugi resolve o Enigma do Milénio?',
+    respostas: ['Recebe poderes mágicos', 'É transportado para o Egito','É possuído pela alma de um faraó', 'Perde a memória'],
+    correta: 2
+  },
+  {
+    anime: 'Yu-Gi-Oh! (Millennium Puzzle)',
+    fundo: 'https://gamex.gg/wp-content/uploads/2023/02/s-l1600.png',
+    pergunta: 'Qual é o verdadeiro nome do espírito dentro do Enigma do Milénio?',
+    respostas: ['Marik','Atem', 'Zorc', 'Shadi'],
+    correta: 1
+  },
+  {
+    anime: 'Yu-Gi-Oh! (Millennium Puzzle)',
+    fundo: 'https://mangarabia.b-cdn.net/d8162b5e4374234c4040ea05831e575c/cover.webp',
+    pergunta: 'Qual é o papel do Enigma do Milénio na antiga civilização egípcia?',
+    respostas: [
+      'Selar a alma do Faraó e controlar os Jogos das Sombras',
+      'Conceder imortalidade aos sacerdotes',
+      'Criar monstros reais a partir de cartas',
+      'Transportar o usuário para outra dimensão'
+    ],
+    correta: 0
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://www.journaldujapon.com/wp-content/uploads/2020/07/perfect-1.jpg',
+    pergunta: 'Quem são os irmãos protagonistas de Fullmetal Alchemist?',
+    respostas: ['Edward e Alphonse Elric', 'Roy Mustang e Riza Hawkeye', 'Alex Louis Armstrong e Maes Hughes', 'Ling Yao e Lan Fan'],
+    correta: 0
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://www.journaldujapon.com/wp-content/uploads/2020/07/perfect-1.jpg',
+    pergunta: 'Qual é a profissão de Edward Elric?',
+    respostas: ['Alquimista Federal', 'Cientista', 'Soldado', 'Policial'],
+    correta: 0
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://www.journaldujapon.com/wp-content/uploads/2020/07/perfect-1.jpg',
+    pergunta: 'Qual é o princípio fundamental da alquimia no universo de Fullmetal Alchemist?',
+    respostas: ['Transmutação Instantânea','Lei da Troca Equivalente', 'Energia Infinita', 'Alquimia Negra'],
+    correta: 1
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://www.journaldujapon.com/wp-content/uploads/2020/07/perfect-1.jpg',
+    pergunta: 'Qual é o verdadeiro objetivo dos Homúnculos na série?',
+    respostas: [
+      'Obter a Pedra Filosofal para aumentar seu poder e manipular o mundo',
+      'Destruir a nação de Amestris',
+      'Se tornar humanos normais',
+      'Controlar os irmãos Elric'
+    ],
+    correta: 0
+  },
+   {
+    anime: 'Boruto',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421598222/boruto-vol-3-9781421598222_lg.jpg',
+    pergunta: 'Quem é o pai do Boruto Uzumaki?',
+    respostas: ['Sasuke Uchiha', 'Kakashi Hatake','Naruto Uzumaki', 'Minato Namikaze'],
+    correta: 2
+  },
+  {
+    anime: 'Boruto',
+    fundo: 'https://m.media-amazon.com/images/I/61SykLq3y4L._SY425_.jpg',
+    pergunta: 'Qual é o nome do melhor amigo de Boruto?',
+    respostas: ['Mitsuki', 'Sarada Uchiha', 'Shikadai Nara', 'Konohamaru Sarutobi'],
+    correta: 0
+  },
+  {
+    anime: 'Boruto',
+    fundo: 'https://tse2.mm.bing.net/th/id/OIP.QoYpakW8ImfkaLu52MT9fwAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do clã de Sarada?',
+    respostas: ['Hyuga','Uchiha', 'Nara', 'Akimichi'],
+    correta: 1
+  },
+  {
+    anime: 'Boruto',
+    fundo: 'https://tse2.mm.bing.net/th/id/OIP.QoYpakW8ImfkaLu52MT9fwAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é a técnica proibida usada por Kawaki que o torna perigoso?',
+    respostas: [
+      'Marca Karma',
+      'Chidori',
+      'Sharingan',
+      'Susanoo'
+    ],
+    correta: 0
+  },
+  {
+    anime: 'Naruto',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421528427/naruto-vol-41-9781421528427_hr.jpg',
+    pergunta: 'Qual é o sonho de Naruto Uzumaki?',
+    respostas: [
+     
+      'Ser um grande ninja médico',
+       'Tornar-se Hokage',
+      'Vingar a morte dos pais',
+      'Dominar todas as técnicas'
+    ],
+    correta: 1
+  },
+  {
+    anime: 'Naruto',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421528427/naruto-vol-41-9781421528427_hr.jpg',
+    pergunta: 'Quem é o melhor amigo e rival de Naruto?',
+    respostas: ['Kakashi Hatake', 'Shikamaru Nara', 'Gaara','Sasuke Uchiha'],
+    correta: 3
+  },
+  {
+    anime: 'Naruto',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421528427/naruto-vol-41-9781421528427_hr.jpg',
+    pergunta: 'Qual é o nome do estilo de luta característico de Rock Lee?',
+    respostas: ['Ninjutsu','Taijutsu', 'Genjutsu', 'Fuinjutsu'],
+    correta: 1
+  },
+  {
+    anime: 'Naruto',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421528427/naruto-vol-41-9781421528427_hr.jpg',
+    pergunta: 'Quem foi o verdadeiro responsável por atacar a vila da folha na invasão de Pain?',
+    respostas: [
+      'Nagato',
+      'Orochimaru',
+      'Madara Uchiha',
+      'Kabuto Yakushi'
+    ],
+    correta: 0
+  },
+  {
+    anime: 'One Piece',
+    fundo: 'https://www.manga-news.com/public/images/vols/one-piece-61-glenat.jpg',
+    pergunta: 'Qual é o sonho de Monkey D. Luffy?',
+    respostas: [
+      'Encontrar o One Piece e se tornar o Rei dos Piratas',
+      'Ser o melhor espadachim do mundo',
+      'Ser o mais forte samurai',
+      'Dominar a Grand Line'
+    ],
+    correta: 0
+  },
+  {
+    anime: 'One Piece',
+    fundo: 'https://img.sanctuary.fr/objet/300/283984.jpg',
+    pergunta: 'Quem é o cozinheiro da tripulação do Chapéu de Palha?',
+    respostas: ['Zoro','Sanji', 'Usopp', 'Franky'],
+    correta: 1
+  },
+  {
+    anime: 'One Piece',
+    fundo: 'https://static.planetebd.com/dynamicImages/album/cover/large/34/40/album-cover-large-34406.jpg',
+    pergunta: 'Qual é o nome do navio original da tripulação de Luffy?',
+    respostas: ['Going Merry', 'Thousand Sunny', 'Moby Dick', 'Red Force'],
+    correta: 0
+  },
+  {
+    anime: 'One Piece',
+    fundo: 'https://img.sanctuary.fr/objet/300/283984.jpg',
+    pergunta: 'Qual é o nome do tesouro lendário procurado por todos os piratas no mundo de One Piece?',
+    respostas: [
+      
+      'Poneglyph',
+      'All Blue',
+      'One Piece',
+      'Raftel'
+    ],
+    correta: 2
+  },
+  {
+    anime: 'Dragon Ball Z',
+    fundo: 'https://th.bing.com/th/id/R.218ddc6c5f338458a84ed6cd396989ff?rik=ySjEOx3NBuWeVg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do protagonista principal de Dragon Ball Z?',
+    respostas: [ 'Vegeta','Goku', 'Gohan', 'Piccolo'],
+    correta: 1
+  },
+  {
+    anime: 'Dragon Ball Z',
+    fundo: 'https://www.planetebd.com/dynamicImages/album/cover/large/15/96/album-cover-large-15967.jpg',
+    pergunta: 'Qual é a técnica de combate mais famosa de Goku?',
+    respostas: ['Final Flash', 'Especial Beam Cannon', 'Galick Gun','Kamehameha'],
+    correta: 3
+  },
+  {
+    anime: 'Dragon Ball Z',
+    fundo: 'https://static1.cbrimages.com/wordpress/wp-content/uploads/2025/06/dragon-ball-toriyama-archives-db-final-chapter-title-page-full-art.jpg',
+    pergunta: 'Qual é o nome do planeta natal dos Saiyajins?',
+    respostas: ['Planeta Vegeta', 'Planeta Namekusei', 'Terra', 'Planeta Frieza'],
+    correta: 0
+  },
+  {
+    anime: 'Dragon Ball Z',
+    fundo: 'https://static1.cbrimages.com/wordpress/wp-content/uploads/2025/06/dragon-ball-toriyama-archives-db-final-chapter-title-page-full-art.jpg',
+    pergunta: 'Qual a transformação que Goku alcança pela primeira vez durante a luta contra Freeza?',
+    respostas: [
+      
+      'Kaioken',
+      'Ultra Instinto',
+      'Super Saiyajin',
+      'Super Saiyajin 2'
+    ],
+    correta: 2
+  },
+  {
+    anime: 'Death Note',
+    fundo: 'https://speculativechic.com/wp-content/uploads/2019/01/death-note-manga.jpg',
+    pergunta: 'Quem encontra o Death Note pela primeira vez?',
+    respostas: ['Light Sukuna', 'L','Light Yagami', 'Ryuk', 'Near'],
+    correta: 2
+  },
+  {
+    anime: 'Death Note',
+    fundo: 'https://speculativechic.com/wp-content/uploads/2019/01/death-note-manga.jpg',
+    pergunta: 'Qual é o nome do Shinigami que acompanha Light?',
+    respostas: ['Ryuk', 'Rem', 'Gelus', 'Sidoh'],
+    correta: 0
+  },
+  {
+    anime: 'Death Note',
+    fundo: 'https://cdn11.bigcommerce.com/s-9xdcxxuu0e/images/stencil/1280w/products/499/2066/DEATHNOTE13HOWTOREAD__79869.1587074500.jpg?c=1',
+    pergunta: 'Qual é o codinome usado por Light para suas ações?',
+    respostas: ['L', 'Near', 'Mello','Kira'],
+    correta: 3
+  },
+  {
+    anime: 'Death Note',
+    fundo: 'https://cdn11.bigcommerce.com/s-9xdcxxuu0e/images/stencil/1280w/products/499/2066/DEATHNOTE13HOWTOREAD__79869.1587074500.jpg?c=1',
+    pergunta: 'Qual é a regra do Death Note para matar alguém sem especificar a causa da morte?',
+    respostas: [
+      'A pessoa morre de ataque cardíaco em 40 segundos',
+      'A pessoa morre em 6 horas',
+      'A pessoa morre de acidente',
+      'A pessoa morre após 24 horas'
+    ],
+    correta: 0
+  },
+
+  {
+    anime: 'Attack on Titan',
+    fundo: 'https://th.bing.com/th/id/R.b4535e25381af1d4bcd97b5b5366c825?rik=bEZ67LSOer2SyQ&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do protagonista principal?',
+    respostas: ['Mikasa Ackerman','Eren Yeager', 'Armin Arlert', 'Levi Ackerman'],
+    correta: 1
+  },
+  {
+    anime: 'Attack on Titan',
+    fundo: 'https://th.bing.com/th/id/R.b4535e25381af1d4bcd97b5b5366c825?rik=bEZ67LSOer2SyQ&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o objetivo principal dos personagens no início da série?',
+    respostas: [
+      'Explorar o mundo fora das muralhas',
+      'Defender as muralhas dos Titãs',
+      'Descobrir a origem dos Titãs',
+      'Destruir o exército inimigo'
+    ],
+    correta: 1
+  },
+  {
+    anime: 'Attack on Titan',
+    fundo: 'https://th.bing.com/th/id/R.b4535e25381af1d4bcd97b5b5366c825?rik=bEZ67LSOer2SyQ&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da técnica usada pelos soldados para se movimentarem rapidamente?',
+    respostas: [
+      'Manobra tridimensional',
+      'Jutsu de clonagem',
+      'Respiração da água',
+      'Arte marcial aérea'
+    ],
+    correta: 0
+  },
+  {
+    anime: 'Attack on Titan',
+    fundo: 'https://i.pinimg.com/736x/02/4f/36/024f36f024bd6596fbcebb43d436756d.jpg',
+    pergunta: 'Quem foi o primeiro personagem a se transformar em Titã na série?',
+    respostas: ['Eren Yeager', 'Annie Leonhart', 'Bertolt Hoover', 'Reiner Braun'],
+    correta: 1
+  },
+  {
+    anime: 'My Hero Academia',
+    fundo: 'https://th.bing.com/th/id/R.67f3a6a91cd9ad3e329bfc6750f93301?rik=8DoE9srY6SHZng&riu=http%3a%2f%2fwww.manga-sanctuary.com%2fimageslesseries2%2fmy-hero-academia-manga-volume-1-simple-240907.jpg&ehk=1HtPP6GIQynLtrze28qJU%2fZOYDtfi6AjQyrq%2fWHDQ6I%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do protagonista principal de My Hero Academia?',
+    respostas: ['Izuku Midoriya', 'Katsuki Bakugo', 'Shoto Todoroki', 'Tenya Iida'],
+    correta: 0
+  },
+  {
+    anime: 'My Hero Academia',
+    fundo: 'https://dwgkfo5b3odmw.cloudfront.net/manga/thumbs/thumb-86564-MyHeroAcademia_GN26_C1_Web-3-Wo-ILmENjECBydnOttrhOg.jpg',
+    pergunta: 'Qual é o Quirk de Ochaco Uraraka?',
+    respostas: [ 'Explosões', 'Força sobre-humana','Gravidade zero', 'Controle de gelo'],
+    correta: 2
+  },
+  {
+    anime: 'My Hero Academia',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421582702/my-hero-academia-vol-2-9781421582702_hr.jpg',
+    pergunta: 'Quem é o atual professor da Classe 1-A na U.A.?',
+    respostas: ['All Might', 'Shota Aizawa', 'Gran Torino', 'Endeavor'],
+    correta: 1
+  },
+  {
+    anime: 'My Hero Academia',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421585116/my-hero-academia-vol-4-9781421585116_hr.jpg',
+    pergunta: 'Qual é o nome verdadeiro do vilão conhecido como Tomura Shigaraki?',
+    respostas: ['Dabi', 'Kai Chisaki', 'Shinso Hitoshi','Tenko Shimura'],
+    correta: 3
+  },
+  {
+    anime: 'Demon Slayer',
+    fundo: 'https://th.bing.com/th/id/R.ecc5b372e018e3e70d0664be885b8f19?rik=or4puu3dR2M0bg&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o protagonista principal de Demon Slayer?',
+    respostas: ['Zenitsu Agatsuma', 'Inosuke Hashibira','Tanjiro Kamado', 'Giyu Tomioka'],
+    correta: 2
+  },
+  {
+    anime: 'Demon Slayer',
+    fundo: 'https://th.bing.com/th/id/R.ecc5b372e018e3e70d0664be885b8f19?rik=or4puu3dR2M0bg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é a principal arma usada pelos caçadores de demônios?',
+    respostas: ['Nichirin Blade', 'Katana comum', 'Martelo', 'Arco e flecha'],
+    correta: 0
+  },
+  {
+    anime: 'Demon Slayer',
+    fundo: 'https://i.pinimg.com/originals/21/e7/cc/21e7ccc2be67ed73a240511b454fe180.jpg',
+    pergunta: 'Qual é a habilidade especial de Zenitsu?',
+    respostas: ['Respiração da Água','Respiração do Trovão', 'Respiração do Fogo', 'Respiração da Pedra'],
+    correta: 1
+  },
+  {
+    anime: 'Demon Slayer',
+    fundo: 'https://i.pinimg.com/originals/21/e7/cc/21e7ccc2be67ed73a240511b454fe180.jpg',
+    pergunta: 'Quem é o principal antagonista da série, o Rei dos Demônios?',
+    respostas: ['Muzan Kibutsuji', 'Akaza', 'Daki', 'Douma'],
+    correta: 0
+  },
+  {
+    anime: 'Tokyo Ghoul',
+    fundo: 'https://th.bing.com/th/id/R.47c4e2bbafaf8e5e308adef4299e4983?rik=r0Nf4QPhcKKgSQ&riu=http%3a%2f%2fwww.manga-sanctuary.com%2fimageslesseries2%2ftokyo-ghoul-manga-volume-1-francaise-73492%5b1%5d.jpg&ehk=4%2f6RUjXucCawGrE44b3jKi%2fc2WveDGh4foTgjD8U4p8%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do protagonista de Tokyo Ghoul?',
+    respostas: ['Kaneki Ken', 'Touka Kirishima', 'Hideyoshi Nagachika', 'Juuzou Suzuya'],
+    correta: 0
+  },
+  {
+    anime: 'Tokyo Ghoul',
+    fundo: 'https://th.bing.com/th/id/R.47c4e2bbafaf8e5e308adef4299e4983?rik=r0Nf4QPhcKKgSQ&riu=http%3a%2f%2fwww.manga-sanctuary.com%2fimageslesseries2%2ftokyo-ghoul-manga-volume-1-francaise-73492%5b1%5d.jpg&ehk=4%2f6RUjXucCawGrE44b3jKi%2fc2WveDGh4foTgjD8U4p8%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'O que é um "ghoul" na série?',
+    respostas: ['Uma criatura que se alimenta de humanos', 'Um caçador de demônios', 'Um espírito', 'Um ninja'],
+    correta: 0
+  },
+  {
+    anime: 'Tokyo Ghoul',
+    fundo: 'https://th.bing.com/th/id/R.47c4e2bbafaf8e5e308adef4299e4983?rik=r0Nf4QPhcKKgSQ&riu=http%3a%2f%2fwww.manga-sanctuary.com%2fimageslesseries2%2ftokyo-ghoul-manga-volume-1-francaise-73492%5b1%5d.jpg&ehk=4%2f6RUjXucCawGrE44b3jKi%2fc2WveDGh4foTgjD8U4p8%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da organização que caça ghouls?',
+    respostas: ['Ghouls United', 'Ghoul Hunters', 'Reapers','CCG'],
+    correta: 3
+  },
+  {
+    anime: 'Tokyo Ghoul',
+    fundo: 'https://th.bing.com/th/id/R.47c4e2bbafaf8e5e308adef4299e4983?rik=r0Nf4QPhcKKgSQ&riu=http%3a%2f%2fwww.manga-sanctuary.com%2fimageslesseries2%2ftokyo-ghoul-manga-volume-1-francaise-73492%5b1%5d.jpg&ehk=4%2f6RUjXucCawGrE44b3jKi%2fc2WveDGh4foTgjD8U4p8%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da máscara que Kaneki usa para esconder sua identidade?',
+    respostas: ['Máscara do Corvo','Máscara do Unicórnio', 'Máscara do Cachorro', 'Máscara do Lobo'],
+    correta: 1
+  },
+   {
+    anime: 'Sword Art Online',
+    fundo: 'https://th.bing.com/th/id/R.b2ca8eb95e26b959173febe733b31bdd?rik=XVnooJzSwyQkjw&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o protagonista principal de Sword Art Online?',
+    respostas: ['Kirito', 'Asuna', 'Sinon', 'Leafa'],
+    correta: 0
+  },
+  {
+    anime: 'Sword Art Online',
+    fundo: 'https://th.bing.com/th/id/R.b2ca8eb95e26b959173febe733b31bdd?rik=XVnooJzSwyQkjw&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do jogo onde Kirito fica preso no início da série?',
+    respostas: ['Alfheim Online', 'Gun Gale Online','Sword Art Online', 'Underworld'],
+    correta: 2
+  },
+  {
+    anime: 'Sword Art Online',
+    fundo: 'https://th.bing.com/th/id/R.b2ca8eb95e26b959173febe733b31bdd?rik=XVnooJzSwyQkjw&pid=ImgRaw&r=0',
+    pergunta: 'Como é chamado o sistema que conecta os jogadores ao mundo virtual?',
+    respostas: ['AmuSphere','NerveGear', 'FullDive', 'NeuralLink'],
+    correta: 1
+  },
+  {
+    anime: 'Sword Art Online',
+    fundo: 'https://th.bing.com/th/id/R.b2ca8eb95e26b959173febe733b31bdd?rik=XVnooJzSwyQkjw&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do criador do jogo Sword Art Online?',
+    respostas: ['Akihiko Kayaba', 'Heathcliff', 'Klein', 'Eiji'],
+    correta: 0
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421540184/fullmetal-alchemist-3-in-1-edition-vol-1-9781421540184_hr.jpg',
+    pergunta: 'Quem são os irmãos protagonistas da série?',
+    respostas: ['Edward e Alphonse Elric', 'Roy Mustang e Riza Hawkeye', 'Maes Hughes e Alex Louis Armstrong', 'Scar e Ling Yao'],
+    correta: 0
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421540184/fullmetal-alchemist-3-in-1-edition-vol-1-9781421540184_hr.jpg',
+    pergunta: 'Qual é a profissão de Edward Elric?',
+    respostas: ['Soldado', 'Mercenário', 'Alquimista rebelde','Alquimista Federal'],
+    correta: 3
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421540184/fullmetal-alchemist-3-in-1-edition-vol-1-9781421540184_hr.jpg',
+    pergunta: 'O que aconteceu que fez os irmãos Elric tentarem a transmutação humana?',
+    respostas: [
+      
+      'Queriam obter ouro',
+      'Queriam trazer a mãe de volta à vida',
+      'Queriam dominar o país',
+      'Queriam criar uma nova alquimia'
+    ],
+    correta: 1
+  },
+  {
+    anime: 'Fullmetal Alchemist',
+    fundo: 'https://wallpaperaccess.com/full/338379.jpg',
+    pergunta: 'Qual é o verdadeiro objetivo dos Homúnculos na série?',
+    respostas: [
+      
+      'Destruir o exército Amestris',
+      'Ajudar os Elric a recuperar seus corpos',
+      'Criar a Pedra Filosofal para controlar a humanidade',
+      'Controlar os alquimistas federais'
+    ],
+    correta: 2
+  },
+   {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781421540184/fullmetal-alchemist-3-in-1-edition-vol-1-9781421540184_hr.jpg',
+    pergunta: 'Quem é o protagonista principal da série?',
+    respostas: ['Yuji Itadori', 'Megumi Fushiguro', 'Satoru Gojo', 'Nobara Kugisaki'],
+    correta: 0
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Jujutsu_kaisen.jpg/250px-Jujutsu_kaisen.jpg',
+    pergunta: 'O que é um objeto amaldiçoado em Jujutsu Kaisen?',
+    respostas: [
+      'Um tipo de arma normal',
+      'Um artefato contendo energia negativa',
+      'Um amuleto de proteção',
+      'Uma técnica de luta'
+    ],
+    correta: 1
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Jujutsu_kaisen.jpg/250px-Jujutsu_kaisen.jpg',
+    pergunta: 'Qual é a técnica especial usada por Satoru Gojo para controlar o espaço?',
+    respostas: [
+     
+      'Cursed Energy Manipulation',
+      'Domain Expansion',
+       'Limitless (Infinito)',
+      'Black Flash'
+    ],
+    correta: 2
+  },
+  {
+    anime: 'Jujutsu Kaisen',
+    fundo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Jujutsu_kaisen.jpg/250px-Jujutsu_kaisen.jpg',
+    pergunta: 'Qual é o nome do domínio de Sukuna, o Rei das Maldições?',
+    respostas: [
+      
+      'Chimera Shadow Garden',
+      'Malevolent Shrine',
+      'Idle Death Gamble',
+      'Coffin of the Iron Mountain'
+    ],
+    correta: 1
+  },
+   {
+    anime: 'Black Clover',
+    fundo: 'https://th.bing.com/th/id/R.592fa101aecfb9882dded18b531f8b07?rik=VYoPs7GNonWpZA&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o protagonista principal de Black Clover?',
+    respostas: ['Yuno', 'Noelle Silva','Asta', 'Luck Voltia'],
+    correta: 2
+  },
+  {
+    anime: 'Fairy Tail',
+    fundo: 'https://th.bing.com/th/id/R.592fa101aecfb9882dded18b531f8b07?rik=VYoPs7GNonWpZA&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o mestre da guilda Fairy Tail?',
+    respostas: [ 'Gildarts Clive','Makarov Dreyar', 'Laxus Dreyar', 'Erik Cleir'],
+    correta: 1
+  },
+  {
+    anime: 'Fairy Tail',
+    fundo: 'https://th.bing.com/th/id/R.592fa101aecfb9882dded18b531f8b07?rik=VYoPs7GNonWpZA&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do parceiro de Natsu, o gato falante?',
+    respostas: ['Happy', 'Carla', 'Panther Lily', 'Frosch'],
+    correta: 0
+  },
+  {
+    anime: 'Fairy Tail',
+    fundo: 'https://img.sanctuary.fr/big/fairy-tail-manga-volume-60-collector-290285.jpg',
+    pergunta: 'Qual é a magia usada por Erza Scarlet?',
+    respostas: ['Magia de Armadura Reequipada', 'Magia do Fogo', 'Magia Celestial', 'Magia de Ilusão'],
+    correta: 0
+  },
+  {
+    anime: 'Fairy Tail',
+    fundo: 'https://i.pinimg.com/originals/e8/af/3e/e8af3e571256e8c5bf05ef53f83cc116.png',
+    pergunta: 'Qual é o nome do primeiro Dragon Slayer que Natsu derrotou?',
+    respostas: ['Igneel', 'Fierro', 'Metalicana', 'Atlas Flame'],
+    correta: 3
+  },
+  {
+    anime: 'Mob Psycho 100',
+    fundo: 'https://kuroneko.lt/wp-content/uploads/2022/12/0068_MOB-PSYCHO-100-VOLUME-1.jpg',
+    pergunta: 'Qual é o nome real do protagonista conhecido como Mob?',
+    respostas: ['Shigeo Kageyama', 'Ritsu Kageyama', 'Teruki Hanazawa', 'Reigen Arataka'],
+    correta: 0
+  },
+  {
+    anime: 'Mob Psycho 100',
+    fundo: 'https://kuroneko.lt/wp-content/uploads/2022/12/0068_MOB-PSYCHO-100-VOLUME-1.jpg',
+    pergunta: 'Quem é o mentor e chefe de Mob na agência de exorcismo?',
+    respostas: ['Teruki Hanazawa', 'Dimple', 'Claw Leader','Reigen Arataka'],
+    correta: 3
+  },
+  {
+    anime: 'Mob Psycho 100',
+    fundo: 'https://kuroneko.lt/wp-content/uploads/2022/12/0068_MOB-PSYCHO-100-VOLUME-1.jpg',
+    pergunta: 'Qual é o poder especial de Mob?',
+    respostas: ['Psicocinese', 'Teletransporte', 'Leitura de mentes', 'Viagem no tempo'],
+    correta: 0
+  },
+  {
+    anime: 'Mob Psycho 100',
+    fundo: 'https://kuroneko.lt/wp-content/uploads/2022/12/0068_MOB-PSYCHO-100-VOLUME-1.jpg',
+    pergunta: 'Qual é o nome do grupo antagonista que Mob enfrenta na segunda temporada?',
+    respostas: ['Esper Division','Claw', 'Gakuran Club', 'Spiritual Society'],
+    correta: 1
+  },
+   {
+    anime: 'Inazuma Eleven',
+    fundo: 'https://www.manga-news.com/public/images/vols/Inazuma-1-kurokawa.jpg',
+    pergunta: 'Qual é o nome do protagonista de Inazuma Eleven?',
+    respostas: ['Mark Evans', 'Axel Blaze', 'Shawn Froste', 'Jude Sharp'],
+    correta: 0
+  },
+  {
+    anime: 'Inazuma Eleven',
+    fundo: 'https://www.manga-news.com/public/images/vols/Inazuma-1-kurokawa.jpg',
+    pergunta: 'Qual é o nome do time de futebol da escola Raimon?',
+    respostas: ['Teikoku Gakuen', 'Inazuma Japan','Raimon Eleven', 'Zeus Eleven'],
+   
+    correta: 2
+  },
+  {
+    anime: 'Inazuma Eleven',
+    fundo: 'https://www.manga-news.com/public/images/vols/Inazuma-1-kurokawa.jpg',
+    pergunta: 'Qual técnica especial é famosa por ser usada por Mark Evans?',
+    respostas: ['Finta do Dragão', 'Tornado de Fogo', 'Chute Meteoro', 'Rajada de Gelo'],
+    correta: 0
+  },
+  {
+    anime: 'Inazuma Eleven',
+    fundo: 'https://www.manga-news.com/public/images/vols/Inazuma-1-kurokawa.jpg',
+    pergunta: 'Qual é o nome do poderoso goleiro que enfrenta a Raimon no Campeonato Japonês?',
+    respostas: ['Fudou Akio','Kidou Yuuto', 'Gouenji Shuuya', 'Endou Mamoru'],
+    correta: 1
+  },
+  {
+    anime: 'Captain Tsubasa',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/objet/origin/317553.jpg',
+    pergunta: 'Qual é o nome completo do protagonista de Captain Tsubasa?',
+    respostas: ['Kojiro Hyuga', 'Ryo Ishizaki', 'Genzo Wakabayashi','Tsubasa Oozora'],
+    correta: 3
+  },
+  {
+    anime: 'Captain Tsubasa',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/objet/origin/317553.jpg',
+    pergunta: 'Qual é a posição principal que Tsubasa joga no time?',
+    respostas: ['Goleiro', 'Defensor','Atacante', 'Meio-campo'],
+    correta: 2
+  },
+  {
+    anime: 'Captain Tsubasa',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/objet/origin/317553.jpg',
+    pergunta: 'Quem é o principal rival de Tsubasa durante sua infância?',
+    respostas: ['Mark Lenders', 'Taro Misaki', 'Ryo Ishizaki', 'Sanae Nakazawa'],
+    correta: 0
+  },
+  {
+    anime: 'Captain Tsubasa',
+    fundo: 'https://www.manga-sanctuary.com/v10_good/public/img/objet/origin/317553.jpg',
+    pergunta: 'Qual técnica especial Mark Lenders usa para chutar a bola com grande força?',
+    respostas: ['Chute do Falcão', 'Tornado de Fogo','Tigre de Fogo', 'Rajada de Dragão'],
+    correta: 2
+  },
+  {
+    anime: 'BeyBlade Burst',
+    fundo: 'https://tse2.mm.bing.net/th/id/OIP.9tzW-82IjxF-i4s8_5DuIgHaLB?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do protagonista principal de BeyBlade Burst?',
+    respostas: ['Valt Aoi', 'Shu Kurenai', 'Free De La Hoya', 'Phi'],
+    correta: 0
+  },
+  {
+    anime: 'BeyBlade Burst',
+    fundo: 'https://tse2.mm.bing.net/th/id/OIP.9tzW-82IjxF-i4s8_5DuIgHaLB?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é a camada superior do Beyblade de Valt Aoi?',
+    respostas: ['Spryzen', 'Rage Longinus', 'Drain Fafnir','Valtryek'],
+    correta: 3
+  },
+  {
+    anime: 'BeyBlade Burst',
+    fundo: 'https://tse2.mm.bing.net/th/id/OIP.9tzW-82IjxF-i4s8_5DuIgHaLB?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual tipo de Beyblade é conhecido por absorver o spin do oponente?',
+    respostas: ['Defense', 'Stamina', 'Attack', 'Balance'],
+    correta: 1
+  },
+  {
+    anime: 'BeyBlade Burst',
+    fundo: 'https://tse2.mm.bing.net/th/id/OIP.9tzW-82IjxF-i4s8_5DuIgHaLB?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quem é o fundador da equipe Beigoma Academy?',
+    respostas: ['Valt Aoi', 'Shu Kurenai', 'Ken Midori', 'Daigo Kurogami'],
+    correta: 3
+  },
+  {
+    anime: 'Dragon Ball Super',
+    fundo: 'https://th.bing.com/th/id/R.9538ded3f93872833ce5566e23b0c650?rik=fcvyxb8pE85KFg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do personagem principal de Dragon Ball Super?',
+    respostas: ['Vegeta', 'Goku', 'Gohan', 'Trunks'],
+    correta: 1
+  },
+  {
+    anime: 'Dragon Ball Super',
+    fundo: 'https://www.kanzenshuu.com/wp-content/uploads/2023/02/dbs-90-en-home-large.png',
+    pergunta: 'Qual é a transformação que Goku usa pela primeira vez em Dragon Ball Super?',
+    respostas: ['Super Saiyajin Blue', 'Ultra Instinct', 'Super Saiyajin God', 'Kaioken'],
+    correta: 2
+  },
+  {
+    anime: 'Dragon Ball Super',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.MbIQP8CMtjJW3fL_LkLB8gHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do torneio onde universos lutam para não serem destruídos?',
+    respostas: ['Torneio do Poder', 'Torneio do Mestre Kaio', 'Torneio de Artes Marciais', 'Torneio Z'],
+    correta: 0
+  },
+  {
+    anime: 'Dragon Ball Super',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.MbIQP8CMtjJW3fL_LkLB8gHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quem é o Deus da Destruição do Universo 7?',
+    respostas: ['Champa', 'Whis', 'Zeno','Beerus'],
+    correta: 3
+  },
+  {
+    anime: 'Saint Seiya Omega',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.vjGk5b5WeUylWb7y0rGPBwHaKY?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quem é o protagonista principal de Saint Seiya Omega?',
+    respostas: ['Koga', 'Seiya', 'Soma', 'Ryuhou'],
+    correta: 0
+  },
+  {
+    anime: 'Saint Seiya Omega',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.vjGk5b5WeUylWb7y0rGPBwHaKY?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome da armadura usada por Koga?',
+    respostas: ['Armadura de Ouro de Áries', 'Armadura de Bronze de Pégaso', 'Armadura de Prata de Dragão', 'Armadura de Ouro de Leão'],
+    correta: 1
+  },
+  {
+    anime: 'Saint Seiya Omega',
+    fundo: 'https://i.pinimg.com/originals/08/04/37/0804370b712951fd1be385f1287c7e03.jpg',
+    pergunta: 'Quem é o mestre que treina Koga na série?',
+    respostas: ['Shiryu', 'Seiya', 'Shion', 'Ikki'],
+    correta: 2
+  },
+  {
+    anime: 'Saint Seiya Omega',
+    fundo: 'https://i.pinimg.com/originals/08/04/37/0804370b712951fd1be385f1287c7e03.jpg',
+    pergunta: 'Qual é o nome do vilão principal da primeira saga de Saint Seiya Omega?',
+    respostas: ['Mars', 'Sirius', 'Pallas', 'Evol'],
+    correta: 0
+  },
+  {
+    anime: 'Wakfu',
+    fundo: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/227274e9-8517-4127-8cf0-20792fa0a9f0/d73mfnv-e12e67d5-fb47-4713-a48c-d3949dbce710.jpg/v1/fill/w_600,h_887,q_75,strp/wakfu__cover_comic_by_kennyruiz-d73mfnv.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi8yMjcyNzRlOS04NTE3LTQxMjctOGNmMC0yMDc5MmZhMGE5ZjAvZDczbWZudi1lMTJlNjdkNS1mYjQ3LTQ3MTMtYTQ4Yy1kMzk0OWRiY2U3MTAuanBnIiwid2lkdGgiOiI8PTYwMCIsImhlaWdodCI6Ijw9ODg3In1dXX0.GVMYPrqNc4aAGPfXCkQ2UjiVY-zi0_kDe-UbLbLrCEg',
+    pergunta: 'Qual é o nome do protagonista principal de Wakfu?',
+    respostas: ['Ruel', 'Tristepin','Yugo','Evangelina'],
+    correta: 2
+  },
+  {
+    anime: 'Wakfu',
+    fundo: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/227274e9-8517-4127-8cf0-20792fa0a9f0/d73mfnv-e12e67d5-fb47-4713-a48c-d3949dbce710.jpg/v1/fill/w_600,h_887,q_75,strp/wakfu__cover_comic_by_kennyruiz-d73mfnv.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi8yMjcyNzRlOS04NTE3LTQxMjctOGNmMC0yMDc5MmZhMGE5ZjAvZDczbWZudi1lMTJlNjdkNS1mYjQ3LTQ3MTMtYTQ4Yy1kMzk0OWRiY2U3MTAuanBnIiwid2lkdGgiOiI8PTYwMCIsImhlaWdodCI6Ijw9ODg3In1dXX0.GVMYPrqNc4aAGPfXCkQ2UjiVY-zi0_kDe-UbLbLrCEg',
+    pergunta: 'Qual é a classe do personagem Tristepin?',
+    respostas: ['Sacerdote', 'Ferroviário', 'Cavaleiro', 'Feiticeiro'],
+    correta: 2
+  },
+  {
+    anime: 'Wakfu',
+    fundo: 'https://boundingintocomics.com/wp-content/uploads/2016/01/WAKFU_Cover-A-by-Mig-Saturax.jpg',
+    pergunta: 'Quem é o avô adotivo de Yugo?',
+    respostas: ['Master Paku', 'Ruel', 'Qilby', 'Eliatrope'],
+    correta: 1
+  },
+  {
+    anime: 'Wakfu',
+    fundo: 'https://boundingintocomics.com/wp-content/uploads/2016/01/WAKFU_Cover-A-by-Mig-Saturax.jpg',
+    pergunta: 'Qual é o nome da raça antiga a que Yugo pertence?',
+    respostas: ['Eliatropes', 'Sadidas', 'Fecas', 'Osamodas'],
+    correta: 0
+  },
+  {
+    anime: 'A Casa da Coruja',
+    fundo: 'https://th.bing.com/th/id/R.7d94dd0cfc0b85c5717a4ec9ae3b789c?rik=jhNuFnf4hqtIbw&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da protagonista que encontra a Casa da Coruja?',
+    respostas: ['Luz Noceda', 'Eda Clawthorne', 'Amity Blight', 'Willow Park'],
+    correta: 0
+  },
+  {
+    anime: 'A Casa da Coruja',
+    fundo: 'https://th.bing.com/th/id/R.7d94dd0cfc0b85c5717a4ec9ae3b789c?rik=jhNuFnf4hqtIbw&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o animal de estimação da Eda?',
+    respostas: ['Camaleão', 'Coruja', 'Gato', 'Dragão'],
+    correta: 1
+  },
+  {
+    anime: 'A Casa da Coruja',
+    fundo: 'https://static.wikia.nocookie.net/owl-house/images/6/6c/Owl_House_Key_Art.png',
+    pergunta: 'Qual é o nome do amigo demoníaco que ajuda Luz?',
+    respostas: ['King', 'Gus', 'Hooty', 'Lilith'],
+    correta: 2
+  },
+  {
+    anime: 'A Casa da Coruja',
+    fundo: 'https://i0.wp.com/anmtv.com.br/wp-content/uploads/2022/09/a-casa-da-coruja.jpg?resize=768%2C1139&ssl=1',
+    pergunta: 'Qual é o nome da organização que caça bruxas no desenho?',
+    respostas: ['O Coven do imperador', 'A guilda dos caçadores', 'A ordem das trevas', 'O coven das sombras'],
+    correta: 0
+  },
+   {
+    anime: 'Anfibilândia',
+    fundo: 'https://pics.filmaffinity.com/Anfibilandia_Serie_de_TV-162601521-large.jpg',
+    pergunta: 'Qual é o nome da protagonista humana que vai para Anfibilândia?',
+    respostas: ['Sprig Plantar', 'Marcy Wu','Anne Boonchuy','Hop Pop Plantar'],
+    correta: 2
+  },
+  {
+    anime: 'Anfibilândia',
+    fundo: 'https://pics.filmaffinity.com/Anfibilandia_Serie_de_TV-162601521-large.jpg',
+    pergunta: 'Quem é o melhor amigo sapo de Anne?',
+    respostas: ['Hop Pop Plantar','Sprig Plantar', 'Polly Plantar', 'Marcy Wu'],
+    correta: 1
+  },
+  {
+    anime: 'Anfibilândia',
+    fundo: 'https://artworks.thetvdb.com/banners/posters/5da1ad6b98a61.jpg',
+    pergunta: 'Qual é o nome da cidade onde os sapos moram em Anfibilândia?',
+    respostas: ['Newtopia', 'Wartwood', 'Hopville', 'Frogtown'],
+    correta: 1
+  },
+  {
+    anime: 'Anfibilândia',
+    fundo: 'https://artworks.thetvdb.com/banners/posters/5da1ad6b98a61.jpg',
+    pergunta: 'Qual é a principal ameaça à cidade de Wartwood durante a série?',
+    respostas: ['O Rei Andrias', 'Os Toad Army', 'Os Caçadores de Sapos', 'A Rebelião das Rãs'],
+    correta: 0
+  },
+  {
+    anime: 'O Livro da Selva',
+    fundo: 'https://th.bing.com/th/id/R.48d2093c763a5d9356029dc4dab2ca33?rik=urQsbH3hWPPeRA&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do menino criado na selva pelos lobos?',
+    respostas: ['Baloo', 'Bagheera', 'Shere Khan','Mowgli'],
+    correta: 3
+  },
+  {
+    anime: 'O Livro da Selva',
+    fundo: 'https://th.bing.com/th/id/R.48d2093c763a5d9356029dc4dab2ca33?rik=urQsbH3hWPPeRA&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome do urso amigo de Mowgli?',
+    respostas: ['Bagheera','Baloo', 'Shere Khan', 'Kaa'],
+    correta: 1
+  },
+  {
+    anime: 'O Livro da Selva',
+    fundo: 'https://th.bing.com/th/id/R.48d2093c763a5d9356029dc4dab2ca33?rik=urQsbH3hWPPeRA&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o tigre que quer capturar Mowgli?',
+    respostas: ['Shere Khan', 'Kaa', 'Akela', 'King Louie'],
+    correta: 0
+  },
+  {
+    anime: 'O Livro da Selva',
+    fundo: 'https://th.bing.com/th/id/R.48d2093c763a5d9356029dc4dab2ca33?rik=urQsbH3hWPPeRA&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da pantera que cuida de Mowgli na selva?',
+    respostas: ['Baloo', 'Shere Khan','Bagheera', 'Kaa'],
+    correta: 2
+  },
+  {
+    anime: 'Ladybug',
+    fundo: 'https://wallpapercave.com/wp/wp7426301.jpg',
+    pergunta: 'Qual é o nome verdadeiro da Ladybug?',
+    respostas: ['Alya Césaire','Marinette Dupain-Cheng', 'Chloé Bourgeois', 'Adrien Agreste'],
+    correta: 1
+  },
+  {
+    anime: 'Ladybug',
+    fundo: 'https://static1.cbrimages.com/wordpress/wp-content/uploads/2023/10/miraculous-ladybug-tv-show-poster.jpg',
+    pergunta: 'Qual é o nome do parceiro de Ladybug?',
+    respostas: ['Cat Noir', 'Rena Rouge', 'Carapace', 'Viperion'],
+    correta: 0
+  },
+  {
+    anime: 'Ladybug',
+    fundo: 'https://static1.cbrimages.com/wordpress/wp-content/uploads/2023/10/miraculous-ladybug-tv-show-poster.jpg',
+    pergunta: 'Qual é o nome do vilão que frequentemente cria os Akumas para transformar pessoas em supervilões?',
+    respostas: ['Hawk Moth', 'Mayura', 'Gabriel Agreste', 'Luka Couffaine'],
+    correta: 2
+  },
+  {
+    anime: 'Ladybug',
+    fundo: 'https://static1.cbrimages.com/wordpress/wp-content/uploads/2023/10/miraculous-ladybug-tv-show-poster.jpg',
+    pergunta: 'Qual o nome do kwami de Ladybug?',
+    respostas: ['Tikki', 'Plagg', 'Nooroo', 'Wayzz'],
+    correta: 0
+  },
+   {
+    anime: 'Max Steel',
+    fundo: 'https://th.bing.com/th/id/R.1af378a3b1cd2be38453027800a1a5fc?rik=SdcsMfruAbjm5Q&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fwp1865438.jpg&ehk=GH6TFCw5mKo2eJyBJnGWF1IPktckErBEoSAJqLpGemE%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o verdadeiro nome do protagonista Max Steel?',
+    respostas: ['Steel','Max McGrath', 'Berto', 'Miles Dredd'],
+    correta: 1
+  },
+  {
+    anime: 'Max Steel',
+    fundo: 'https://th.bing.com/th/id/R.1af378a3b1cd2be38453027800a1a5fc?rik=SdcsMfruAbjm5Q&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fwp1865438.jpg&ehk=GH6TFCw5mKo2eJyBJnGWF1IPktckErBEoSAJqLpGemE%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o parceiro alienígena de Max Steel?',
+    respostas: ['Berto', 'Miles Dredd','Steel','Psycho'],
+    correta: 2
+  },
+  {
+    anime: 'Max Steel',
+    fundo: 'https://th.bing.com/th/id/R.1af378a3b1cd2be38453027800a1a5fc?rik=SdcsMfruAbjm5Q&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fwp1865438.jpg&ehk=GH6TFCw5mKo2eJyBJnGWF1IPktckErBEoSAJqLpGemE%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Qual é a fonte dos poderes de Max Steel?',
+    respostas: ['TURBO Energy', 'Energia Solar', 'Energia Nuclear', 'Magia'],
+    correta: 0
+  },
+  {
+    anime: 'Max Steel',
+    fundo: 'https://th.bing.com/th/id/R.1af378a3b1cd2be38453027800a1a5fc?rik=SdcsMfruAbjm5Q&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fwp1865438.jpg&ehk=GH6TFCw5mKo2eJyBJnGWF1IPktckErBEoSAJqLpGemE%3d&risl=&pid=ImgRaw&r=0',
+    pergunta: 'Quem é o principal antagonista na primeira temporada da série?',
+    respostas: ['Steel', 'Troy Winter', 'Ven-Ghan','Miles Dredd'],
+    correta: 3
+  },
+   {
+    anime: 'Os Green na Cidade Grande',
+    fundo: 'https://tse1.mm.bing.net/th/id/OIP.uy-ETGaYs_446c5VaYUnmwAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do garoto protagonista da série?',
+    respostas: ['Cricket Green', 'Billy Green', 'Tom Green', 'Tilly Green'],
+    correta: 0
+  },
+  {
+    anime: 'Os Green na Cidade Grande',
+    fundo: 'https://tse1.mm.bing.net/th/id/OIP.uy-ETGaYs_446c5VaYUnmwAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Como se chama a irmã de Cricket?',
+    respostas: ['Lily', 'Tilly', 'Milly', 'Jilly'],
+    correta: 1
+  },
+  {
+    anime: 'Os Green na Cidade Grande',
+    fundo: 'https://tse1.mm.bing.net/th/id/OIP.uy-ETGaYs_446c5VaYUnmwAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'De onde a família Green se mudou antes de ir para a cidade grande?',
+    respostas: ['Do campo', 'De uma cidade menor', 'Do Texas', 'Da praia'],
+    correta: 0
+  },
+  {
+    
+  "anime": "Os Green na Cidade Grande",
+  "fundo": "https://tse1.mm.bing.net/th/id/OIP.uy-ETGaYs_446c5VaYUnmwAAAA?r=0&rs=1&pid=ImgDetMain",
+  "pergunta": "Como se chama a amiga dos Green que trabalha num café?",
+  "respostas": ["Nancy", "Gloria", "Sra. Green", "Tilly"],
+  "correta": 1
+
+  },
+  {
+    anime: 'Ben 10',
+    fundo: 'https://image.tmdb.org/t/p/original/acnSRPDzUnuCeOuFXiXwV7DMqyn.jpg',
+    pergunta: 'Qual é o nome do protagonista de Ben 10?',
+    respostas: ['Kevin', 'Gwen', 'Ben', 'Max'],
+    correta: 2
+  },
+  {
+    anime: 'Ben 10',
+    fundo: 'https://image.tmdb.org/t/p/original/acnSRPDzUnuCeOuFXiXwV7DMqyn.jpg',
+    pergunta: 'O que é o Omnitrix?',
+    respostas: ['Um relógio mágico', 'Um dispositivo alienígena que transforma Ben em alienígenas', 'Uma arma secreta', 'Um comunicador galáctico'],
+    correta: 1
+  },
+  {
+    anime: 'Ben 10',
+    fundo: 'https://image.tmdb.org/t/p/original/acnSRPDzUnuCeOuFXiXwV7DMqyn.jpg',
+    pergunta: 'Qual destes alienígenas é o primeiro que Ben se transforma?',
+    respostas: ['Chama', 'Quatro Braços', 'XLR8', 'Diamante'],
+    correta: 0
+  },
+  {
+    anime: 'Ben 10',
+    fundo: 'https://image.tmdb.org/t/p/original/acnSRPDzUnuCeOuFXiXwV7DMqyn.jpg',
+    pergunta: 'Quem é o criador original do Omnitrix?',
+    respostas: ['Vilgax', 'Paradoxo', 'Max Tennyson','Azmuth'],
+    correta: 3
+  },
+   {
+    anime: 'O Laboratório de Dexter',
+    fundo: 'https://th.bing.com/th/id/R.4ba2bc599bcd34b4776516be3b4bc9c1?rik=nhptQ8i4LvZnJg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o nome da irmã do Dexter?',
+    respostas: ['Lulu','Dee Dee', 'Susi', 'Lili'],
+    correta: 1
+  },
+  {
+    anime: 'O Laboratório de Dexter',
+    fundo: 'https://th.bing.com/th/id/R.4ba2bc599bcd34b4776516be3b4bc9c1?rik=nhptQ8i4LvZnJg&pid=ImgRaw&r=0',
+    pergunta: 'O que Dexter tenta esconder de seus pais?',
+    respostas: ['Seu diário', 'Seu laboratório secreto', 'Um robô gigante', 'Seus brinquedos'],
+    correta: 1
+  },
+  {
+    anime: 'O Laboratório de Dexter',
+    fundo: 'https://th.bing.com/th/id/R.4ba2bc599bcd34b4776516be3b4bc9c1?rik=nhptQ8i4LvZnJg&pid=ImgRaw&r=0',
+    pergunta: 'Qual é o bordão mais famoso de Dexter quando fica irritado com Dee Dee?',
+    respostas: ['Pare, Dee Dee!', 'Saia do meu laboratório!', 'Você vai destruir tudo!', 'Dee Dee, não toque nisso!'],
+    correta: 1
+  },
+  {
+    anime: 'O Laboratório de Dexter',
+    fundo: 'https://th.bing.com/th/id/R.4ba2bc599bcd34b4776516be3b4bc9c1?rik=nhptQ8i4LvZnJg&pid=ImgRaw&r=0',
+    pergunta: 'Qual era o nome do super-herói que aparecia como parte de um segmento no show de Dexter?',
+    respostas: ['Major Glory', 'Capitão Cosmos', 'Super Max', 'Mega Boy'],
+    correta: 0
+  },
+   {
+    anime: 'Peppa Pig',
+    fundo: 'https://images-na.ssl-images-amazon.com/images/I/616UUoKE6fL._AC_SY879_.jpg',
+    pergunta: 'Qual é o brinquedo favorito da Peppa?',
+    respostas: ['Dino', 'Sr. Batata', 'Teddy', 'Sr. Zebra'],
+    correta: 2
+  },
+  {
+    anime: 'Peppa Pig',
+    fundo: 'https://images-na.ssl-images-amazon.com/images/I/616UUoKE6fL._AC_SY879_.jpg',
+    pergunta: 'Como se chama o irmão mais novo da Peppa?',
+    respostas: ['Tommy', 'George', 'Danny', 'Pedro'],
+    correta: 1
+  },
+  {
+    anime: 'Peppa Pig',
+    fundo: 'https://images-na.ssl-images-amazon.com/images/I/616UUoKE6fL._AC_SY879_.jpg',
+    pergunta: 'Qual o trabalho do Papai Pig?',
+    respostas: ['Engenheiro', 'Professor', 'Arquiteto', 'Desenhista'],
+    correta: 3
+  },
+  {
+    anime: 'Peppa Pig',
+    fundo: 'https://images-na.ssl-images-amazon.com/images/I/616UUoKE6fL._AC_SY879_.jpg',
+    pergunta: 'Qual episódio introduz o personagem "Sr. Batata", que vira uma celebridade no universo da Peppa?',
+    respostas: ['A Festa do Jardim', 'O Dia do Esporte', 'O Show do Sr. Batata', 'Passeio no Trem'],
+    correta: 2
+  },
+  {
+    anime: 'O Incrível Mundo de Gumball',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.v_YOD_zHQ9hvCFqLa6BzswHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do irmão adotivo e melhor amigo de Gumball?',
+    respostas: ['Tobias', 'Darwin', 'Richard', 'Bobert'],
+    correta: 1
+  },
+  {
+    anime: 'O Incrível Mundo de Gumball',
+    fundo: 'https://tse3.mm.bing.net/th/id/OIP.v_YOD_zHQ9hvCFqLa6BzswHaLH?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Em que cidade fictícia a série se passa?',
+    respostas: ['Elmore', 'Springfield', 'Townsville', 'Peach Creek'],
+    correta: 0
+  },
+  {
+    anime: 'O Incrível Mundo de Gumball',
+    fundo: 'https://th.bing.com/th/id/R.107cbd0be60d52d08f177ed14f2bca71?rik=i%2fOlCHcaPW2xFQ&pid=ImgRaw&r=0',
+    pergunta: 'Qual o nome da irmã mais nova do Gumball?',
+    respostas: ['Nicole', 'Tina', 'Anais', 'Carrie'],
+    correta: 2
+  },
+  {
+    anime: 'O Incrível Mundo de Gumball',
+    fundo: 'https://th.bing.com/th/id/R.107cbd0be60d52d08f177ed14f2bca71?rik=i%2fOlCHcaPW2xFQ&pid=ImgRaw&r=0',
+    pergunta: 'Qual episódio é conhecido por satirizar a lógica dos desenhos animados com Gumball e Darwin questionando a realidade da escola?',
+    respostas: ['O Jogo', 'O Terceiro', 'O Episódio', 'O Código'],
+    correta: 2
+  },
+  {
+    anime: 'Steven Universe',
+    fundo: 'https://image.tmdb.org/t/p/original/9QwbXpSZGbgLgvZOelvGampEhMv.jpg',
+    pergunta: 'Qual é o nome da pedra preciosa que Steven carrega?',
+    respostas: ['Safira', 'Esmeralda', 'Rubi', 'Quartzo Rosa'],
+    correta: 3
+  },
+  {
+    anime: 'Steven Universe',
+    fundo: 'https://image.tmdb.org/t/p/original/9QwbXpSZGbgLgvZOelvGampEhMv.jpg',
+    pergunta: 'Quem são as três Gems que cuidam de Steven?',
+    respostas: ['Safira, Rubi e Pérola', 'Ametista, Garnet e Pérola', 'Jade, Garnet e Peridot', 'Topázio, Pérola e Esmeralda'],
+    correta: 1
+  },
+  {
+    anime: 'Steven Universe',
+    fundo: 'https://image.tmdb.org/t/p/original/9QwbXpSZGbgLgvZOelvGampEhMv.jpg',
+    pergunta: 'Qual é o nome da cidade onde Steven vive?',
+    respostas: ['Crystal City', 'Beach City', 'Ocean View', 'Sunset Town'],
+    correta: 1
+  },
+  {
+    anime: 'Steven Universe',
+    fundo: 'https://image.tmdb.org/t/p/original/9QwbXpSZGbgLgvZOelvGampEhMv.jpg',
+    pergunta: 'Qual é o verdadeiro nome da fusão entre Garnet, Amethyst e Pearl?',
+    respostas: ['Obsidian', 'Alexandrite', 'Sardonyx', 'Opal'],
+    correta: 1
+  },
+  {
+    anime: 'As Aventuras do Gato de Botas',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.3LULZU_gZLHT31Wmu35RPgAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome do protagonista da série?',
+    respostas: ['Felix', 'Gato de Botas', 'Don Gato', 'Gato Guerreiro'],
+    correta: 1
+  },
+  {
+    anime: 'As Aventuras do Gato de Botas',
+    fundo:'https://tse4.mm.bing.net/th/id/OIP.3LULZU_gZLHT31Wmu35RPgAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o nome da cidade onde o Gato de Botas vive aventuras?',
+    respostas: ['San Lorenzo', 'El Pueblo', 'Cidade Gato', 'Nueva Espada'],
+    correta: 0
+  },
+  {
+    anime: 'As Aventuras do Gato de Botas',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.3LULZU_gZLHT31Wmu35RPgAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Quem é a jovem órfã que se torna amiga do Gato de Botas?',
+    respostas: ['Dulcinea', 'Mirabel', 'Luna', 'Sofia'],
+    correta: 0
+  },
+  {
+    anime: 'As Aventuras do Gato de Botas',
+    fundo: 'https://tse4.mm.bing.net/th/id/OIP.3LULZU_gZLHT31Wmu35RPgAAAA?r=0&rs=1&pid=ImgDetMain',
+    pergunta: 'Qual é o segredo mágico que protege San Lorenzo?',
+    respostas: ['Uma espada mágica', 'Uma pedra encantada', 'Uma barreira invisível', 'Uma antiga bênção que impede a entrada de estranhos'],
+    correta: 3
+  },
+  {
+    anime: 'Os Manos Kratts',
+    fundo: 'https://digicartaz.com/uploads/posts/2023-06/os-manos-kratts.webp',
+    pergunta: 'Qual é o nome dos dois irmãos protagonistas?',
+    respostas: ['Chris e Martin', 'Tom e Jerry', 'Ben e Max', 'Jack e Sam'],
+    correta: 0
+  },
+  {
+    anime: 'Os Manos Kratts',
+    fundo: 'https://digicartaz.com/uploads/posts/2023-06/os-manos-kratts.webp',
+    pergunta: 'Qual é o objetivo dos Manos Kratts nas aventuras?',
+    respostas: ['Lutar contra vilões', 'Explorar planetas', 'Ensinar sobre animais e natureza', 'Caçar tesouros'],
+    correta: 2
+  },
+  {
+    anime: 'Os Manos Kratts',
+    fundo: 'https://digicartaz.com/uploads/posts/2023-06/os-manos-kratts.webp',
+    pergunta: 'Qual personagem ajuda os irmãos com tecnologia e equipamentos?',
+    respostas: ['Koki','Aviva', 'Jimmy Z', 'Lana'],
+    correta: 1
+  },
+  {
+    anime: 'Os Manos Kratts',
+    fundo: 'https://digicartaz.com/uploads/posts/2023-06/os-manos-kratts.webp',
+    pergunta: 'Qual é o nome do traje especial que permite aos irmãos usar habilidades de animais?',
+    respostas: ['BioTraje', 'SuperTraje', 'Traje Animal', 'Disco Criatura'],
+    correta: 3
+  },
+  {
+    anime: 'Supa Strikas',
+    fundo: 'https://artworks.thetvdb.com/banners/posters/288983-1.jpg',
+    pergunta: 'Quem é o capitão da equipa Supa Strikas na versão SIC-K?',
+    respostas: ['Rasta', 'Shakes', 'El Matador', 'North Shaw'],
+    correta: 0 // Fácil
+  },
+  {
+    anime: 'Supa Strikas',
+    fundo: 'https://artworks.thetvdb.com/banners/posters/288983-1.jpg',
+    pergunta: 'Qual é o nome do guarda-redes dos Supa Strikas?',
+    respostas: ['Coach','Big Bo', 'Blok', 'North Shaw'],
+    correta: 1// Fácil
+  },
+  {
+    anime: 'Supa Strikas',
+    fundo: 'https://wallpapercave.com/wp/wp2424256.jpg',
+    pergunta: 'Qual é a equipa rival principal dos Supa Strikas no campeonato?',
+    respostas: ['Invincible United', 'Iron Tank', 'Kickoff', 'FC Panters'],
+    correta: 0 // Média
+  },
+  {
+    anime: 'Supa Strikas',
+    fundo: 'https://wallpapercave.com/wp/wp2424256.jpg',
+    pergunta: 'Quem é o treinador dos Supa Strikas conhecido por ser exigente e apaixonado pelo futebol?',
+    respostas: ['Big Bo', 'Coach Zed', 'Zed','Coach Parker'],
+    correta: 3 // Difícil
+  }
+
+];
+
+
+let score = 0;
+let current = 0;
+let correctStreak = 0;
+let timerInterval;
+let timer = 10;
+let helpsUsed = [false, false, false, false];
+let helpDisabled = false;
+let gameStarted = false;
+let jogoFinalizado = false;
+let errors = 0;
+let bardeados="";
+const MAX_ERRORS = 5;
+
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const vidaE1 = document.getElementById('vida-restante');
+const helpIcons = [
+  document.getElementById('help1'),
+  document.getElementById('help2'),
+  document.getElementById('help3'),
+  document.getElementById('help4')
+];
+
+const startScreen = document.getElementById('start-screen');
+const endScreen = document.getElementById('end-screen');
+const finalScoreEl = document.getElementById('final-score');
+const startButton = document.getElementById('start-button');
+const restartButton = document.getElementById('restart-button');
+const gameContainer = document.getElementById('game-container');
+
+const bgMusic = document.getElementById('bgMusic');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+
+
+
+
+
+// Função para tocar sons, com tratamento
+function playSound(sound) {
+  if (!sound) return;
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
+}
+
+function updateScore() {
+  scoreEl.innerText = `Kz ${score}`;
+  if(score < 0) score = 0; // não deixa score negativo
+}
+
+// Atualiza plano de fundo conforme anime
+function updateBackground(index) {
+  const url = perguntas[index].fundo;
+  document.body.style.backgroundImage = `url('${url}')`;
+}
+
+// Exibe pergunta e respostas
+function loadQuestion() {
+
+       if (jogoFinalizado) return;
+
+  clearInterval(timerInterval);
+  vidaE1.innerText = `${MAX_ERRORS-errors}❤️`;
+  timer = 10;
+  timerEl.innerText = timer;
+  timerEl.style.color = 'green';
+  timerEl.style.display = 'flex';
+  helpDisabled = false;
+
+  enableHelpIcons();
+  enableAnswers();
+  removePercentHints();
+
+  updateBackground(current);
+
+  questionEl.innerText = perguntas[current].pergunta;
+
+  // Limpa respostas antigas
+  answersEl.innerHTML = '';
+
+  perguntas[current].respostas.forEach((resposta, idx) => {
+    const div = document.createElement('div');
+    div.className = 'answer';
+    div.dataset.index = idx;
+    div.innerHTML = `<span>${String.fromCharCode(65 + idx)}</span>${resposta}`;
+    div.addEventListener('click', () => handleAnswer(idx));
+    answersEl.appendChild(div);
+  });
+
+  startTimer();
+}
+
+// Ativa timer e decrementa a cada segundo
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timer--;
+    timerEl.innerText = timer;
+    if (timer <= 5) {
+      timerEl.style.color = 'red';
+    } else {
+      timerEl.style.color = 'green';
+    }
+    if (timer === 0) {
+      clearInterval(timerInterval);
+      timerEl.style.color = 'red';
+      timerEl.innerText = 'Tempo esgotado!';
+      handleTimeout();
+    }
+  }, 1000);
+}
+
+// Quando o tempo acaba sem resposta
+function handleTimeout() {
+  // Retira pontos e atualiza placar
+  score -= 80;
+  if(score < 0) score = 0;
+  updateScore();
+    
+
+  errors++; // ⬅️ Conta erro
+  checkErrors(); // ⬅️ Verifica se passou do limite
+
+  // Marca a resposta correta
+  markCorrectAnswer();
+
+  // Bloqueia respostas e ajuda
+  disableAnswers();
+  disableHelpIcons();
+
+  // Após 2 segundos, passa para próxima pergunta ou fim do jogo
+  setTimeout(() => {
+    nextQuestionOrEnd();
+  }, 2000);
+}
+
+// Marca a resposta correta na tela
+function markCorrectAnswer() {
+  const correctIndex = perguntas[current].correta;
+  const allAnswers = document.querySelectorAll('.answer');
+  allAnswers.forEach((ans, idx) => {
+    ans.classList.add('disabled');
+    if(idx === correctIndex) {
+      ans.classList.add('correct');
+    }
+  });
+}
+
+// Desativa todas as respostas para impedir interação
+function disableAnswers() {
+  const allAnswers = document.querySelectorAll('.answer');
+  allAnswers.forEach(ans => {
+    ans.classList.add('disabled');
+  });
+}
+
+// Ativa respostas para seleção
+function enableAnswers() {
+  const allAnswers = document.querySelectorAll('.answer');
+  allAnswers.forEach(ans => {
+    ans.classList.remove('disabled', 'correct', 'wrong');
+  });
+}
+
+// Desativa ícones de ajuda
+function disableHelpIcons() {
+  helpIcons.forEach(icon => icon.classList.add('disabled'));
+}
+
+// Ativa ícones de ajuda que ainda não foram usados
+function enableHelpIcons() {
+  helpIcons.forEach((icon, idx) => {
+    if (helpsUsed[idx]) {
+      icon.classList.add('disabled');
+    } else {
+      icon.classList.remove('disabled');
+    }
+  });
+}
+
+// Remove dicas de porcentagem da tela
+function removePercentHints() {
+  const percentHints = document.querySelectorAll('.percent-hint');
+  percentHints.forEach(el => el.remove());
+}
+
+// Mostra dicas de porcentagem ao lado das respostas
+function showPercentHints() {
+  removePercentHints();
+  const allAnswers = document.querySelectorAll('.answer');
+  allAnswers.forEach((ans) => {
+    const span = document.createElement('div');
+    span.className = 'percent-hint';
+    span.innerText = `${(Math.random() * 100).toFixed(0)}%`;
+    ans.appendChild(span);
+  });
+}
+
+// Elimina exatamente duas respostas erradas
+function eliminateTwoWrong() {
+  const correctIndex = perguntas[current].correta;
+  const allAnswers = Array.from(document.querySelectorAll('.answer'));
+  // Pegue respostas erradas não eliminadas ainda (sem classe 'disabled' e sem classe 'correct')
+  let wrongAnswers = allAnswers.filter((ans, idx) => idx !== correctIndex && !ans.classList.contains('disabled'));
+  if (wrongAnswers.length <= 2) {
+    // se tem 2 ou menos erradas, elimina todas
+    wrongAnswers.forEach(ans => {
+      ans.classList.add('disabled');
+      ans.style.opacity = '0.3';
+    });
+  } else {
+    // remove aleatoriamente duas delas
+    for(let i=0; i<2; i++) {
+      let idx = Math.floor(Math.random() * wrongAnswers.length);
+      let ans = wrongAnswers.splice(idx,1)[0];
+      ans.classList.add('disabled');
+      ans.style.opacity = '0.3';
+    }
+  }
+}
+
+// Marca a resposta correta e trata como resposta certa (ponto)
+function showCorrectAnswerHelp() {
+  disableHelpIcons();
+  disableAnswers();
+  helpsUsed[2] = true;
+
+  const correctIndex = perguntas[current].correta;
+  const allAnswers = document.querySelectorAll('.answer');
+  allAnswers.forEach((ans, idx) => {
+    if(idx === correctIndex) {
+      ans.classList.add('correct');
+    } else {
+      ans.classList.add('disabled');
+    }
+  });
+
+  // Dá pontos como se o jogador tivesse acertado
+  score += 80;
+  correctStreak++;
+  updateScore();
+
+  // Avança para próxima após 2 segundos
+  setTimeout(() => {
+    nextQuestionOrEnd();
+  }, 2000);
+}
+
+// Passa para a próxima pergunta ou finaliza o jogo
+function nextQuestionOrEnd() {
+  current++;
+  if (current >= perguntas.length || score == 2000 ) {
+    // Fim do jogo
+    endGame();
+  } else {
+    loadQuestion();
+  }
+}
+
+
+
+
+
+// Finaliza o jogo, mostra tela final
+function endGame() {
+
+  clearInterval(timerInterval);
+
+  if (jogoFinalizado) return; // Evita múltiplas chamadas
+  jogoFinalizado = true;
+  vidaE1.style.display = 'none';
+  timerEl.style.display = 'none';
+  gameContainer.style.display = 'none';
+  endScreen.style.display = 'flex';
+  
+  errors = 0;
+
+  finalScoreEl.innerHTML = `  <p id="final-score"> Sua pontuação final foi: <span class="no-break"> ${score}Kz </span><br></p>`;
+ 
+  if (score >=2000) {
+       // Gera e mostra o código
+      const codigoHex = gerarCodigoHexadecimalComMarcadores();
+      finalScoreEl.innerText = finalScoreEl.innerText + `Reclame seu prêmio enviando a chave secreta :${codigoHex}${bardeados}`;
+      // Oculta botão "Jogar Novamente"
+      document.getElementById('restart-button').style.display = 'none';
+     // Mostra botão "Reclamar prêmio"
+      document.querySelector('.chave-button').style.display = 'inline-block';
+       //oculta a mensagem ao perdedor
+      document.querySelector('.ponto-inferior').style.display = 'none';
+      document.getElementById('whatsapp-chave').style.display = 'block';
+      bgMusic.pause();
+  }
+
+  else {
+  // Mostra botão "Jogar Novamente"
+  document.getElementById('restart-button').style.display = 'inline-block';
+
+  // Oculta botão "Reclamar prêmio"
+  document.querySelector('.chave-button').style.display = 'none';
+  // mostra a mensagem ao perdedor
+  document.querySelector('.ponto-inferior').style.display = 'inline-block';
+  document.getElementById('whatsapp-chave').style.display = 'none';
+  bgMusic.pause();
+}
+
+
+
+  // Para música de fundo
+  if(!bgMusic.paused) bgMusic.pause();
+
+}
+
+
+
+
+
+
+
+
+
+// Reseta o jogo para jogar novamente
+function resetGame() {
+  score = 0;
+  current = 0;
+  correctStreak = 0;
+  helpsUsed = [false, false, false, false];
+  helpDisabled = false;
+  gameStarted = true;
+
+  updateScore();
+  loadQuestion();
+  gameContainer.style.display = 'flex';
+  endScreen.style.display = 'none';
+  startScreen.style.display = 'none';
+
+  bgMusic.play().catch(() => {});
+}
+
+// Manipula clique em resposta
+function handleAnswer(selectedIndex) {
+  if(helpDisabled) return; // bloqueado
+  helpDisabled = true;
+  clearInterval(timerInterval);
+  disableHelpIcons();
+  disableAnswers();
+
+  const correctIndex = perguntas[current].correta;
+  if(selectedIndex === correctIndex) {
+    // Acertou
+    correctSound.currentTime = 0;
+    correctSound.play().catch(() => {});
+    score += 80; // PONTUAÇÃO NENGUE 
+    correctStreak++;
+    updateScore();
+
+    // Mostra feedback verde
+    const selectedDiv = answersEl.querySelector(`.answer[data-index='${selectedIndex}']`);
+    selectedDiv.classList.add('correct');
+    timerEl.style.display = 'none';
+
+    setTimeout(() => {
+      nextQuestionOrEnd();
+    }, 1500);
+  } else {
+    // Errou
+    wrongSound.currentTime = 0;
+    wrongSound.play().catch(() => {});
+    errors++; // ⬅️ Conta erro
+    checkErrors(); // ⬅️ Verifica se passou do lim
+    score -= 80;
+    if(score < 0) score = 0;
+    updateScore();
+    correctStreak = 0;
+
+    // Marca correto em verde e erro em vermelho
+    const selectedDiv = answersEl.querySelector(`.answer[data-index='${selectedIndex}']`);
+    const correctDiv = answersEl.querySelector(`.answer[data-index='${correctIndex}']`);
+    selectedDiv.classList.add('wrong');
+    correctDiv.classList.add('correct');
+    timerEl.style.display = 'none';
+
+    setTimeout(() => {
+      nextQuestionOrEnd();
+    }, 2500);
+  }
+}
+
+// Função chamada quando ajuda é clicada
+function handleHelp(index) {
+  if(helpsUsed[index] || helpDisabled) return;
+  helpsUsed[index] = true;
+  helpIcons[index].classList.add('disabled');
+
+  switch(index) {
+    case 0: // Mostrar porcentagem
+      showPercentHints();
+      break;
+    case 1: // Eliminar 2 respostas erradas
+      eliminateTwoWrong();
+      break;
+    case 2: // Mostrar resposta correta e contar ponto
+      showCorrectAnswerHelp();
+      break;
+    case 3: // Pular pergunta sem penalidade
+      clearInterval(timerInterval);
+      disableAnswers();
+      disableHelpIcons();
+      timerEl.style.display = 'none';
+      correctStreak = 0;
+      setTimeout(() => {
+        nextQuestionOrEnd();
+      }, 1000);
+      break;
+  }
+}
+
+helpIcons.forEach((icon, idx) => {
+  icon.addEventListener('click', () => handleHelp(idx));
+});
+
+startButton.addEventListener('click', () => {
+  shuffle(perguntas);
+  jogoFinalizado=false;
+  startScreen.style.display = 'none';
+  gameContainer.style.display = 'flex';
+  vidaE1.style.display = 'flex';
+  resetGame();
+});
+
+restartButton.addEventListener('click', () => {
+  shuffle(perguntas);
+  jogoFinalizado=false;
+  endScreen.style.display = 'none';
+  gameContainer.style.display = 'flex';
+  vidaE1.style.display = 'flex';
+  resetGame();
+
+});
+
+
+//Redireciona ao PRIO
+document.querySelector('.chave-button').addEventListener('click', () => {
+  window.open('https://www.facebook.com/profile.php?id=61577972632172', '_blank'); // Abre em nova aba
+});
+
+
+
+function gerarCodigoHexadecimalComMarcadores() {
+  const marcadores = ["3Z", "2Y", "3X", "6W", "8V"];
+  const marcador = marcadores[Math.floor(Math.random() * marcadores.length)];
+
+  // Gera partes aleatórias
+  function gerarHexAleatorio(tamanho) {
+    const hex = "0123456789ABCDEF";
+    let resultado = "";
+    for (let i = 0; i < tamanho; i++) {
+      resultado += hex[Math.floor(Math.random() * hex.length)];
+    }
+    return resultado;
+  }
+
+  // Construir o código:
+  // total 12 caracteres: AABBCDEFYYGH
+  // Onde BB = marcador[0], CC = marcador[1] nas posições 3–4 e 10–11
+  const parte1 = gerarHexAleatorio(2);          // posições 1–2
+  const parte2 = marcador[0];                   // posição 3
+  const parte3 = marcador[1];                   // posição 4
+  const parte4 = gerarHexAleatorio(5);          // posições 5–9
+  const parte5 = marcador[0];                   // posição 10
+  const parte6 = marcador[1];                   // posição 11
+  const parte7 = gerarHexAleatorio(1);          // posição 12
+
+  const codigoFinal = parte1 + parte2 + parte3 + parte4 + parte5 + parte6 + parte7;
+  return codigoFinal;
+}
+
+
+
+
+// Lista dos marcadores válidos, mesmo usados na geração do código
+const marcadoresValidos = ["3Z", "2Y", "3X", "6W", "8V"];
+
+/**
+ * Função que verifica se o código recebido é válido,
+ * confirmando se os marcadores especiais estão nas posições corretas.
+ * 
+ * @param {string} codigo - código de 15 caracteres a ser verificado
+ * @returns {boolean} - true se código válido, false caso contrário
+ */
+function autenticarCodigo(codigo) {
+  if (codigo.length !== 15) {
+    return false; // código deve ter exatamente 15 caracteres
+  }
+
+  // Extrair as três posições onde os marcadores devem estar
+  const marcador1 = codigo.slice(2, 4);  // posições 3-4 (index 2 e 3)
+  const marcador2 = codigo.slice(7, 9);  // posições 8-9 (index 7 e 8)
+  const marcador3 = codigo.slice(12, 14); // posições 13-14 (index 12 e 13)
+
+  // Verificar se todos os marcadores são válidos e iguais entre si
+  const todosValidos = 
+    marcadoresValidos.includes(marcador1) &&
+    marcador1 === marcador2 &&
+    marcador2 === marcador3;
+
+  return todosValidos;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+
+
+
+function checkErrors() {
+  if (errors >= MAX_ERRORS) {
+    endGame();
+  }
+}
+
+
+const dataInicio = new Date('2025-06-28T18:00:00'); // data e hora alvo
+const preStartScreen = document.getElementById('pre-start-screen');
+const countdownEl = document.getElementById('countdown');
+const senhaContainer = document.getElementById('senha-container');
+const senhaErro = document.getElementById('senha-erro');
+
+
+
+function atualizarContagem() {
+  const agora = new Date();
+  const diferenca = dataInicio - agora;
+
+  if (diferenca > 0) {
+    const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
+    const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
+    const segundos = Math.floor((diferenca / 1000) % 60);
+
+    countdownEl.innerText = `Faltam ${dias} dia(s), ${horas} hora(s), ${minutos} minuto(s) e ${segundos} segundo(s) para o jogo começar!`;
+  } else {
+    countdownEl.style.display = "none";
+    senhaContainer.style.display = "block";
+    clearInterval(intervalo);
+  }
+}
+
+function verificarSenha() {
+
+  const valor = document.getElementById("senha-input").value;
+  
+  if (autenticarCodigo(valor) || valor==="tgtg20200223") {
+         if (valor=="tgtg20200223"){ bardeados="00X";}
+         preStartScreen.style.display = "none";
+         document.querySelector(".menu-superior").style.display = "none"; // Esconde o menu superior
+         document.getElementById("rodape-login").style.display = "none"; // ⬅️ Esconde rodapé
+    
+  } else {
+    senhaErro.style.display = "block";
+  }
+}
+
+const intervalo = setInterval(atualizarContagem, 1000);
+
+
+ // Defina aqui a data/hora de finalização da competição
+   const dataFinalizacao = new Date('2025-06-28T19:00:00');
+
+
+  function verificarFinalizacao() {
+    const agora = new Date();
+
+    if (agora >= dataFinalizacao) {
+      // Mostra o overlay e bloqueia acesso ao site
+      document.getElementById('tempoFinalizadoOverlay').style.display = 'flex';
+      // Opcional: também pode esconder o conteúdo do site
+      document.getElementById('conteudoSite').style.display = 'none';
+    } else {
+      // Ainda não terminou, garantir que o overlay está oculto
+      document.getElementById('tempoFinalizadoOverlay').style.display = 'none';
+      document.getElementById('conteudoSite').style.display = 'block';
+    }
+  }
+
+  // Verifica a cada 1 segundo se o tempo já passou
+  setInterval(verificarFinalizacao, 1000);
+
+  // Verifica imediatamente ao carregar a página
+  verificarFinalizacao();
+
+
+
+</script>
+</body>
+</html>
