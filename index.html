@@ -783,7 +783,13 @@ body {
 
 <!-- Overlay que aparecerá quando o tempo finalizar -->
 
-
+<!-- Formulário para autenticar chave secreta -->
+<div id="autenticar-chave" style="margin: 40px auto; max-width: 400px; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px;">
+  <h3>Autenticar Chave Secreta</h3>
+  <input type="text" id="input-chave" placeholder="Digite a chave secreta" style="padding:10px; width: 80%; border-radius:5px; border:none;">
+  <button onclick="autenticarChave()">Verificar</button>
+  <div id="resultado-chave" style="margin-top:10px; font-weight:bold;"></div>
+</div>
 
 
 
@@ -2367,7 +2373,19 @@ function handleTimeout() {
     nextQuestionOrEnd();
   }, 2000);
 }
-
+// ...existing code...
+function autenticarChave() {
+  const chave = document.getElementById('input-chave').value.trim();
+  const resultado = document.getElementById('resultado-chave');
+  if (autenticarCodigo(chave)) {
+    resultado.style.color = 'limegreen';
+    resultado.innerText = '✅ Chave secreta válida!';
+  } else {
+    resultado.style.color = 'red';
+    resultado.innerText = '❌ Chave inválida!';
+  }
+}
+// ...existing code...
 // Marca a resposta correta na tela
 function markCorrectAnswer() {
   const correctIndex = perguntas[current].correta;
